@@ -15,21 +15,17 @@ var textInoutDecoration = InputDecoration(
   ),
 );
 
-void showSnackBar(context, color, message) {
-  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-    content: Text(
-      message,
-      style: GoogleFonts.ubuntu(fontSize: 14),
+void showSnackBar(BuildContext context, Color color, String text) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(
+        text,
+        style: const TextStyle(fontSize: 14),
+      ),
+      backgroundColor: color,
+      duration: const Duration(seconds: 2),
     ),
-    backgroundColor: color,
-    duration: const Duration(seconds: 2),
-    action: SnackBarAction(
-      label: "Ok",
-      onPressed: () {},
-      textColor: Colors.white,
-    ),
-  ));
-
+  );
 }
 
 void nextScreen(context, page) {

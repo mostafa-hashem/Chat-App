@@ -1,8 +1,8 @@
 import 'package:chat_app/shared/constants/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../screens/chat/chat_screen.dart';
-import '../widgets.dart';
+import '../screens/chat/chat_screen.dart';
+import 'widgets.dart';
 
 class GroupTitle extends StatefulWidget {
   const GroupTitle({
