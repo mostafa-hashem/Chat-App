@@ -21,7 +21,6 @@ class HelperFunctions {
     return await sp.setString(userEmailKey, email);
   }
 
-  
   // getting the data to SP
   static Future<bool?> getUserLoggedInStatus() async {
     SharedPreferences sp = await SharedPreferences.getInstance();
@@ -37,5 +36,4 @@ class HelperFunctions {
     SharedPreferences sf = await SharedPreferences.getInstance();
     return sf.getString(userNameKey);
   }
-
 }

@@ -1,14 +1,14 @@
 import 'package:chat_app/helper/helper_functions.dart';
 import 'package:chat_app/layout/home_layout.dart';
-import 'package:chat_app/screens/auth/login_screen.dart';
+import 'package:chat_app/screens/auth/login/login_screen.dart';
 import 'package:chat_app/services/auth_services.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../shared/constants/app_colors.dart';
-import '../../widgets/widgets.dart';
+import '../../../shared/constants/app_colors.dart';
+import '../../../widgets/widgets.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});

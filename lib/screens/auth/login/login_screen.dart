@@ -6,11 +6,11 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../helper/helper_functions.dart';
-import '../../layout/home_layout.dart';
-import '../../services/auth_services.dart';
-import '../../widgets/widgets.dart';
-import 'package:chat_app/screens/auth/signup_screen.dart';
+import '../../../helper/helper_functions.dart';
+import '../../../layout/home_layout.dart';
+import '../../../services/auth_services.dart';
+import '../../../widgets/widgets.dart';
+import 'package:chat_app/screens/auth/signup/signup_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});

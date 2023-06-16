@@ -1,10 +1,11 @@
 import 'package:chat_app/helper/helper_functions.dart';
 import 'package:chat_app/layout/home_layout.dart';
-import 'package:chat_app/screens/auth/login_screen.dart';
-import 'package:chat_app/screens/auth/signup_screen.dart';
-import 'package:chat_app/screens/groups_screen.dart';
-import 'package:chat_app/screens/profile_screen.dart';
-import 'package:chat_app/screens/search_screen.dart';
+import 'package:chat_app/screens/auth/login/login_screen.dart';
+import 'package:chat_app/screens/auth/signup/signup_screen.dart';
+import 'package:chat_app/screens/chat/chat_screen.dart';
+import 'package:chat_app/screens/groups/groups_screen.dart';
+import 'package:chat_app/screens/profile/profile_screen.dart';
+import 'package:chat_app/screens/search/search_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -40,12 +41,14 @@ class _MyAppState extends State<MyApp> {
         setState(() {
           _isSignedIn = value;
         });
+        print("Value: $value");
       }
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    print("Is SignedIn: $_isSignedIn");
     return ScreenUtilInit(
         designSize: const Size(360, 690),
         minTextAdapt: true,
@@ -53,8 +56,7 @@ class _MyAppState extends State<MyApp> {
         builder: (BuildContext context, Widget? child) {
           return MaterialApp(
             debugShowCheckedModeBanner: false,
-            initialRoute:
-                _isSignedIn ? HomeLayout.routeName : LoginScreen.routeName,
+            home: _isSignedIn ? const HomeLayout() : const LoginScreen(),
             routes: {
               HomeLayout.routeName: (c) => const HomeLayout(),
               LoginScreen.routeName: (c) => const LoginScreen(),

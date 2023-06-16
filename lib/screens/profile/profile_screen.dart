@@ -1,12 +1,11 @@
+import 'package:chat_app/layout/home_layout.dart';
 import 'package:chat_app/shared/constants/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
-
-import '../helper/helper_functions.dart';
-import '../services/auth_services.dart';
-import 'auth/login_screen.dart';
-import 'groups_screen.dart';
+import '../../helper/helper_functions.dart';
+import '../../services/auth_services.dart';
+import '../auth/login/login_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   static const String routeName = "ProfileScreen";
@@ -94,7 +93,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             ListTile(
               onTap: () {
-                Navigator.pushNamed(context, GroupsScreen.routeName);
+                Navigator.pushNamed(context, HomeLayout.routeName);
               },
               contentPadding:
                   const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
