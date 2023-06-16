@@ -68,8 +68,13 @@ class DatabaseServices {
   }
 
   Future getGroupAdmin(String groupId) async {
-  DocumentReference documentReference = groupCollection.doc(groupId);
-  DocumentSnapshot documentSnapshot = await documentReference.get();
-  return documentSnapshot['admin'];
+    DocumentReference documentReference = groupCollection.doc(groupId);
+    DocumentSnapshot documentSnapshot = await documentReference.get();
+    return documentSnapshot['admin'];
+  }
+
+  //get group members
+  getGroupMembers(String groupId) async {
+    return groupCollection.doc(groupId).snapshots();
   }
 }
