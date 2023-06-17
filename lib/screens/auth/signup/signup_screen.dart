@@ -46,7 +46,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Text("Chat App",
+                      Text("Chatoo",
                           style: GoogleFonts.novaFlat(fontSize: 30.sp)),
                       SizedBox(
                           height: MediaQuery.of(context).size.height * 0.01),

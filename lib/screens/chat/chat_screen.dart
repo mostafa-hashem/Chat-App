@@ -76,7 +76,7 @@ class _ChatScreenState extends State<ChatScreen> {
       ),
       body: Stack(
         children: <Widget>[
-          // chatMessages(),
+          chatMessages(),
           Container(
             alignment: Alignment.bottomCenter,
             width: MediaQuery.of(context).size.width,
@@ -136,22 +136,27 @@ class _ChatScreenState extends State<ChatScreen> {
                   return MessageTile(
                       message: snapshot.data.docs[index]['message'],
                       sender: snapshot.data.docs[index]['sender'],
-                      sendByMe: widget.userName ==
-                          snapshot.data.docs[index]['sender']);
-                })
+                      sentByMe: widget.userName ==
+                          snapshot.data.docs[index]['sender'],
+                      timeOfMessage: snapshot.data.docs[index]['time']);
+                },
+              )
             : Container();
       },
     );
   }
 
   void sendMessage() {
-    if(messageController.text.isNotEmpty){
-      Map<String,dynamic>chapMessageMap = {
+    if (messageController.text.isNotEmpty) {
+      Map<String, dynamic> chapMessageData = {
         "message": messageController.text,
         "sender": widget.userName,
         "time": DateTime.now().millisecondsSinceEpoch,
       };
-      DatabaseServices().sendMessage(groupId, chatMessageData);
+      DatabaseServices().sendMessage(widget.groupId, chapMessageData);
+      setState(() {
+        messageController.clear();
+      });
     }
   }
 }
