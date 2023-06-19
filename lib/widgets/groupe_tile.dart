@@ -1,11 +1,11 @@
-import 'package:chat_app/shared/constants/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../screens/chat/chat_screen.dart';
+import '../screens/groups/groups_chat_screen.dart';
+import '../shared/styles/app_colors.dart';
 import 'widgets.dart';
 
-class GroupTitle extends StatefulWidget {
-  const GroupTitle({
+class GroupTile extends StatefulWidget {
+  const GroupTile({
     Key? key,
     required this.groupId,
     required this.groupName,
@@ -17,17 +17,17 @@ class GroupTitle extends StatefulWidget {
   final String groupName;
 
   @override
-  State<GroupTitle> createState() => _GroupTitleState();
+  State<GroupTile> createState() => _GroupTileState();
 }
 
-class _GroupTitleState extends State<GroupTitle> {
+class _GroupTileState extends State<GroupTile> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
         nextScreen(
             context,
-            ChatScreen(
+            GroupsChatScreen(
               groupId: widget.groupId,
               groupName: widget.groupName,
               userName: widget.userName,

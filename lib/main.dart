@@ -1,12 +1,12 @@
-import 'package:chat_app/layout/home_layout.dart';
-import 'package:chat_app/screens/auth/login/login_screen.dart';
-import 'package:chat_app/screens/auth/signup/signup_screen.dart';
-import 'package:chat_app/screens/profile/profile_screen.dart';
-import 'package:chat_app/screens/search/search_screen.dart';
-import 'package:chat_app/screens/startup_screen.dart';
+import 'package:chat_app/screens/splach_screen.dart';
+import 'package:chat_app/shared/provider/app_provider.dart';
+import 'package:chat_app/shared/styles/my_theme.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -14,14 +14,19 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(const MyApp());
+  runApp(ChangeNotifierProvider(
+      create: (BuildContext context) => MyAppProvider(), child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  late MyAppProvider provider;
+
+  MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
+    getPreferences();
+    provider = Provider.of<MyAppProvider>(context);
     return ScreenUtilInit(
         designSize: const Size(360, 690),
         minTextAdapt: true,
@@ -29,16 +34,27 @@ class MyApp extends StatelessWidget {
         builder: (BuildContext context, Widget? child) {
           return MaterialApp(
             debugShowCheckedModeBanner: false,
-            initialRoute: StartUpScreen.routeName,
-            routes: {
-              StartUpScreen.routeName: (c) => const StartUpScreen(),
-              HomeLayout.routeName: (c) => const HomeLayout(),
-              LoginScreen.routeName: (c) => const LoginScreen(),
-              SignupScreen.routeName: (c) => const SignupScreen(),
-              SearchScreen.routeName: (c) => const SearchScreen(),
-              ProfileScreen.routeName: (c) => ProfileScreen(),
-            },
+            theme: MyThemeData.lightTheme,
+            darkTheme: MyThemeData.darkTheme,
+            themeMode: provider.themeMode,
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            locale: Locale(provider.language),
+            home: const SplashScreen(),
           );
         });
+  }
+
+  void getPreferences() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? language = prefs.getString('language');
+    provider.changeLanguage(language!);
+    if (prefs.getString('theme') == 'dark') {
+      provider.changeTheme(ThemeMode.dark);
+    } else if (prefs.getString('theme') == 'system') {
+      provider.changeTheme(ThemeMode.system);
+    } else {
+      provider.changeTheme(ThemeMode.light);
+    }
   }
 }

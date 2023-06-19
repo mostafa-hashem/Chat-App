@@ -1,10 +1,11 @@
-import 'package:chat_app/layout/home_layout.dart';
 import 'package:chat_app/services/database_services.dart';
 import 'package:chat_app/widgets/widgets.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../shared/constants/app_colors.dart';
+import '../../shared/styles/app_colors.dart';
+import 'groups_screen.dart';
 
 class GroupInfo extends StatefulWidget {
   const GroupInfo(
@@ -52,10 +53,6 @@ class _GroupInfoState extends State<GroupInfo> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        elevation: 0,
-        centerTitle: true,
-        backgroundColor: AppColors.primaryColor,
-        toolbarHeight: 80,
         title: Text(
           "Group Info",
           style: GoogleFonts.ubuntu(fontWeight: FontWeight.bold),
@@ -82,6 +79,7 @@ class _GroupInfoState extends State<GroupInfo> {
                             )),
                         IconButton(
                             onPressed: () {
+                              DatabaseServices().deleteUser(widget.groupId);
                               DatabaseServices(
                                       uid: FirebaseAuth
                                           .instance.currentUser!.uid)
@@ -89,7 +87,7 @@ class _GroupInfoState extends State<GroupInfo> {
                                       widget.groupId,
                                       getName(widget.adminName),
                                       widget.groupName);
-                              nextScreenReplace(context, const HomeLayout());
+                              nextScreenReplace(context, const GroupsScreen());
                             },
                             icon: const Icon(
                               Icons.done,
@@ -117,7 +115,7 @@ class _GroupInfoState extends State<GroupInfo> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   CircleAvatar(
-                    radius: 30,
+                    radius: 30.r,
                     backgroundColor: AppColors.primaryColor,
                     child: Text(
                       widget.adminName.substring(0, 1).toUpperCase(),
@@ -134,7 +132,7 @@ class _GroupInfoState extends State<GroupInfo> {
                       Text(
                         "Group: ${widget.groupName}",
                         style: GoogleFonts.ubuntu(
-                            fontWeight: FontWeight.w500, fontSize: 15),
+                            fontWeight: FontWeight.w500, fontSize: 15.sp),
                       ),
                       SizedBox(
                         height: MediaQuery.of(context).size.height * 0.01,
@@ -142,7 +140,7 @@ class _GroupInfoState extends State<GroupInfo> {
                       Text(
                         "Admin: ${getName(widget.adminName)}",
                         style: GoogleFonts.ubuntu(
-                            fontWeight: FontWeight.w500, fontSize: 15),
+                            fontWeight: FontWeight.w500, fontSize: 15.sp),
                       ),
                     ],
                   )
@@ -171,11 +169,11 @@ class _GroupInfoState extends State<GroupInfo> {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 5, vertical: 10),
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(30),
+                            borderRadius: BorderRadius.circular(25.r),
                           ),
                           child: ListTile(
                             leading: CircleAvatar(
-                              radius: 30,
+                              radius: 25.r,
                               backgroundColor: AppColors.primaryColor,
                               child: Text(
                                 getName(snapshot.data['members'][index])
@@ -189,7 +187,9 @@ class _GroupInfoState extends State<GroupInfo> {
                             title:
                                 Text(getName(snapshot.data['members'][index])),
                             subtitle: Text(
-                                "ID: ${getId(snapshot.data['members'][index])}"),
+                              "ID: ${getId(snapshot.data['members'][index])}",
+                              style: Theme.of(context).textTheme.bodySmall,
+                            ),
                           ));
                     });
               } else {

@@ -12,7 +12,7 @@ class DatabaseServices {
       FirebaseFirestore.instance.collection("groups");
 
   Future savingUserData(String fullName, String email) async {
-    return await userCollection.doc(uid).set({
+    return await userCollection.doc(uid) .set({
       "fullName": fullName,
       "email": email,
       "groups": [],
@@ -79,8 +79,13 @@ class DatabaseServices {
   }
 
   //search on groups by name
-  searchByName(String groupName) {
+  searchGroupsByName(String groupName) {
     return groupCollection.where('groupName', isEqualTo: groupName).get();
+  }
+
+  //search on users by name
+  searchUsersByName(String fullName) {
+    return userCollection.where("fullName", isEqualTo: fullName).get();
   }
 
   Future<bool> isUserJoined(
@@ -109,8 +114,11 @@ class DatabaseServices {
         "groups": FieldValue.arrayRemove(["${groupId}_$groupName"])
       });
       await groupDocumentReference.update({
-        "members": FieldValue.arrayRemove(["${uid}_$userName"])
+        "members": FieldValue.arrayRemove(["${uid}_$userName"]),
       });
+      await groupDocumentReference.collection("members").doc(uid).delete();
+      // DatabaseReference firebaseDatabaseReference = FirebaseDatabase.instance.reference();
+      // firebaseDatabaseReference.child("groups").child(groupId).child("members").child(uid).remove();
     } else {
       await userDocumentReference.update({
         "groups": FieldValue.arrayUnion(["${groupId}_$groupName"])
@@ -130,4 +138,19 @@ class DatabaseServices {
       "recentMessageTime": chatMessageData['time'].toString(),
     });
   }
+
+  // delete message
+  Future deleteMessageForAll(String groupId, String messageId) async {
+    await groupCollection
+        .doc(groupId)
+        .collection("messages")
+        .doc(messageId)
+        .delete();
+  }
+
+  // delete user
+ Future deleteUser(String groupId) async {
+   DocumentReference groupDocumentReference = groupCollection.doc(groupId);
+   await groupDocumentReference.collection("members").doc(uid).delete();
+ }
 }

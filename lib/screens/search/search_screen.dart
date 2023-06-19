@@ -1,5 +1,3 @@
-import 'package:chat_app/screens/chat/chat_screen.dart';
-import 'package:chat_app/shared/constants/app_colors.dart';
 import 'package:chat_app/widgets/widgets.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -8,11 +6,11 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../helper/helper_functions.dart';
 import '../../services/database_services.dart';
+import '../../shared/styles/app_colors.dart';
+import '../groups/groups_chat_screen.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
-
-  static const String routeName = "SearchScreen";
 
   @override
   State<SearchScreen> createState() => _SearchScreenState();
@@ -120,7 +118,7 @@ class _SearchScreenState extends State<SearchScreen> {
         isLoading = true;
       });
       await DatabaseServices()
-          .searchByName(searchController.text)
+          .searchGroupsByName(searchController.text)
           .then((snapshot) {
         setState(() {
           searchSnapshot = snapshot;
@@ -162,67 +160,81 @@ class _SearchScreenState extends State<SearchScreen> {
       String userName, String groupId, String groupName, String adminName) {
     //check whether user already exists in group
     joinedOrNot(userName, groupId, groupName, adminName);
-    return ListTile(
-      leading: CircleAvatar(
-        radius: 30,
-        backgroundColor: AppColors.primaryColor,
-        child: Text(
-          getName(groupName).substring(0, 1).toUpperCase(),
-          style: GoogleFonts.ubuntu(
-              fontWeight: FontWeight.w500, color: Colors.white),
+    return InkWell(
+      onTap: () {
+        isJoined
+            ? nextScreen(
+                context,
+            GroupsChatScreen(
+                    groupId: groupId, groupName: groupName, userName: userName))
+            : null;
+      },
+      child: ListTile(
+        leading: CircleAvatar(
+          radius: 30,
+          backgroundColor: AppColors.primaryColor,
+          child: Text(
+            getName(groupName).substring(0, 1).toUpperCase(),
+            style: GoogleFonts.ubuntu(
+                fontWeight: FontWeight.w500, color: Colors.white),
+          ),
         ),
-      ),
-      title: Text(
-        groupName,
-        style: GoogleFonts.ubuntu(),
-      ),
-      subtitle: Text("Admin: ${getName(adminName)}"),
-      trailing: InkWell(
-        onTap: () async {
-          await DatabaseServices(uid: user!.uid)
-              .toggleGroupJoinExit(groupId, userName, groupName);
-          if (isJoined) {
-            setState(() {
-              isJoined = !isJoined;
-            });
-            showSnackBar(context, Colors.green, "Successfully joined he group");
-            Future.delayed(const Duration(seconds: 2), () {
-              nextScreen(
-                  context,
-                  ChatScreen(
-                      groupId: groupId,
-                      groupName: groupName,
-                      userName: userName));
-            });
-          } else {
-            setState(() {
-              isJoined = !isJoined;
-              showSnackBar(context, Colors.red, "Left the group $groupName");
-            });
-          }
-        },
-        child: isJoined
-            ? Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: Colors.black,
-                  border: Border.all(color: Colors.white, width: 1),
+        title: Text(
+          groupName,
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
+        subtitle: Text(
+          "Admin: ${getName(adminName)}",
+          style: Theme.of(context).textTheme.bodySmall,
+        ),
+        trailing: InkWell(
+          onTap: () async {
+            await DatabaseServices(uid: user!.uid)
+                .toggleGroupJoinExit(groupId, userName, groupName);
+            if (isJoined) {
+              setState(() {
+                isJoined = !isJoined;
+              });
+              showSnackBar(
+                  context, Colors.green, "Successfully joined he group");
+              Future.delayed(const Duration(seconds: 2), () {
+                nextScreen(
+                    context,
+                    GroupsChatScreen(
+                        groupId: groupId,
+                        groupName: groupName,
+                        userName: userName));
+              });
+            } else {
+              setState(() {
+                isJoined = !isJoined;
+                showSnackBar(context, Colors.red, "Left the group $groupName");
+              });
+            }
+          },
+          child: isJoined
+              ? Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: Colors.black,
+                    border: Border.all(color: Colors.white, width: 1),
+                  ),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  child: Text("Joined",
+                      style: GoogleFonts.ubuntu(color: Colors.white)),
+                )
+              : Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: AppColors.primaryColor,
+                  ),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  child: Text("Join",
+                      style: GoogleFonts.ubuntu(color: Colors.white)),
                 ),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                child: Text("Joined",
-                    style: GoogleFonts.ubuntu(color: Colors.white)),
-              )
-            : Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: AppColors.primaryColor,
-                ),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                child: Text("Join",
-                    style: GoogleFonts.ubuntu(color: Colors.white)),
-              ),
+        ),
       ),
     );
   }

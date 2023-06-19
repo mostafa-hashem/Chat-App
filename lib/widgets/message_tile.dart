@@ -1,20 +1,27 @@
-import 'package:chat_app/shared/constants/app_colors.dart';
+import 'package:chat_app/services/database_services.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
+
+import '../shared/styles/app_colors.dart';
 
 class MessageTile extends StatefulWidget {
   final String message;
   final String sender;
   final bool sentByMe;
   final int timeOfMessage;
+  final String groupId;
+  final String messageId;
 
-  const MessageTile(
-      {Key? key,
-      required this.message,
-      required this.sender,
-      required this.sentByMe,
-      required this.timeOfMessage})
-      : super(key: key);
+  const MessageTile({
+    Key? key,
+    required this.message,
+    required this.sender,
+    required this.sentByMe,
+    required this.timeOfMessage,
+    required this.groupId,
+    required this.messageId,
+  }) : super(key: key);
 
   @override
   State<MessageTile> createState() => _MessageTileState();
@@ -30,20 +37,71 @@ class _MessageTileState extends State<MessageTile> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.only(
+    return InkWell(
+      onLongPress: () {
+        widget.sentByMe
+            ? showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    title: const Text('Delete Message'),
+                    content: const Text(
+                        'Are you sure you want to delete this message?'),
+                    actions: [
+                      TextButton(
+                        child: const Text('Cancel'),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                      ),
+                      TextButton(
+                        child: const Text('Delete for everyone'),
+                        onPressed: () {
+                          DatabaseServices().deleteMessageForAll(
+                              widget.groupId, widget.messageId);
+                          Navigator.pop(context);
+                        },
+                      ),
+                    ],
+                  );
+                },
+              )
+            : showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    title: const Text('Delete Message'),
+                    content: const Text(
+                        "Sorry you cannot delete other people's messages till now"),
+                    actions: [
+                      TextButton(
+                        child: const Text('Ok'),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                      ),
+                    ],
+                  );
+                },
+              );
+      },
+      child: Container(
+        padding: EdgeInsets.only(
           top: 4,
           bottom: 4,
           left: widget.sentByMe ? 0 : 24,
-          right: widget.sentByMe ? 24 : 0),
-      alignment: widget.sentByMe ? Alignment.centerRight : Alignment.centerLeft,
-      child: Container(
-        margin: widget.sentByMe
-            ? const EdgeInsets.only(left: 30)
-            : const EdgeInsets.only(right: 30),
-        padding:
-            const EdgeInsets.only(top: 17, bottom: 17, left: 20, right: 20),
-        decoration: BoxDecoration(
+          right: widget.sentByMe ? 24 : 0,
+        ),
+        alignment:
+            widget.sentByMe ? Alignment.centerRight : Alignment.centerLeft,
+        child: Container(
+          margin: widget.sentByMe
+              ? const EdgeInsets.only(left: 30)
+              : const EdgeInsets.only(right: 30),
+          padding: widget.sentByMe
+              ? const EdgeInsets.only(top: 17, bottom: 17, left: 30, right: 18)
+              : const EdgeInsets.only(top: 17, bottom: 17, left: 18, right: 30),
+          decoration: BoxDecoration(
             borderRadius: widget.sentByMe
                 ? const BorderRadius.only(
                     topLeft: Radius.circular(20),
@@ -55,35 +113,43 @@ class _MessageTileState extends State<MessageTile> {
                     topRight: Radius.circular(20),
                     bottomRight: Radius.circular(20),
                   ),
-            color: widget.sentByMe ? AppColors.primaryColor : Colors.grey[700]),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              widget.sender.toUpperCase(),
-              textAlign: TextAlign.start,
-              style: const TextStyle(
-                  fontSize: 13,
+            color: widget.sentByMe
+                ? AppColors.primaryColor
+                : const Color(0xff8db4ad),
+          ),
+          child: Column(
+            crossAxisAlignment: widget.sentByMe
+                ? CrossAxisAlignment.end
+                : CrossAxisAlignment.start,
+            children: [
+              Text(
+                widget.sender.toUpperCase(),
+                style: TextStyle(
+                  fontSize: 8.sp,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
-                  letterSpacing: -0.5),
-            ),
-            const SizedBox(
-              height: 8,
-            ),
-            Text(widget.message,
-                textAlign: TextAlign.start,
-                style: const TextStyle(fontSize: 18, color: Colors.white)),
-            const SizedBox(
-              height: 8,
-            ),
-            Text(getFormattedTime(),
-                textAlign: TextAlign.start,
-                style: const TextStyle(
-                    fontSize: 12,
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold))
-          ],
+                ),
+              ),
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.01,
+              ),
+              Text(
+                widget.message,
+                style: TextStyle(fontSize: 15.sp, color: Colors.white),
+              ),
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.01,
+              ),
+              Text(
+                getFormattedTime(),
+                style: TextStyle(
+                  fontSize: 9.sp,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

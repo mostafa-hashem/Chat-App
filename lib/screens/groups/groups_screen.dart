@@ -1,96 +1,118 @@
+import 'package:chat_app/widgets/groupe_tile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../screens/chats/chat_screen.dart';
-import '../screens/groups/groups_screen.dart';
-import '../screens/search/search_screen.dart';
-import '../services/auth_services.dart';
-import '../services/database_services.dart';
-import '../shared/styles/app_colors.dart';
-import '../widgets/drawer_tile.dart';
-import '../widgets/widgets.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import '../../../services/auth_services.dart';
+import '../../../services/database_services.dart';
+import '../../../shared/styles/app_colors.dart';
+import '../../../widgets/widgets.dart';
+import '../../helper/helper_functions.dart';
 
-class HomeLayout extends StatefulWidget {
-  const HomeLayout({super.key});
+class GroupsScreen extends StatefulWidget {
+  const GroupsScreen({super.key});
 
   @override
-  State<HomeLayout> createState() => _HomeLayoutState();
+  State<GroupsScreen> createState() => _GroupsScreenState();
 }
 
-class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
+class _GroupsScreenState extends State<GroupsScreen> {
   AuthServices authService = AuthServices();
   String userName = "";
   String email = "";
   String groupName = "";
   Stream? groups;
   bool _isLoading = false;
-  late final TabController _tabController;
+
+  gettingUserData() async {
+    await HelperFunctions.getUserNameFromSp().then((value) {
+      setState(() {
+        userName = value ?? "";
+      });
+    });
+
+    await HelperFunctions.getUserEmailFromSp().then((value) {
+      setState(() {
+        email = value ?? "";
+      });
+    });
+
+    //getting the list of snapshot from stream
+    await DatabaseServices(uid: FirebaseAuth.instance.currentUser!.uid)
+        .getUserGroups()
+        .then((snapshot) {
+      setState(() {
+        groups = snapshot;
+      });
+    });
+  }
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
+    gettingUserData();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          _tabController.index == 0
-              ? AppLocalizations.of(context)!.chats
-              : AppLocalizations.of(context)!.groups,
-          style: Theme.of(context).textTheme.bodyMedium,
-        ),
-        actions: [
-          IconButton(
-              onPressed: () {
-                nextScreen(context, const SearchScreen());
-              },
-              icon: const Icon(
-                Icons.search,
-              ))
-        ],
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: const <Widget>[
-            Tab(
-              icon: Icon(Icons.wechat_sharp),
+    return StreamBuilder(
+        stream: groups,
+        builder: (context, AsyncSnapshot snapshot) {
+          // make some checks
+          if (snapshot.hasData) {
+            if (snapshot.data['groups'] != null) {
+              if (snapshot.data['groups'].length != 0) {
+                return ListView.builder(
+                  itemCount: snapshot.data['groups'].length,
+                  itemBuilder: (context, index) {
+                    int reverseIndex =
+                        snapshot.data['groups'].length - index - 1;
+                    return GroupTile(
+                        groupId: getId(snapshot.data['groups'][reverseIndex]),
+                        groupName:
+                            getName(snapshot.data['groups'][reverseIndex]),
+                        userName: snapshot.data['fullName']);
+                  },
+                );
+              } else {
+                return noGroupsWidget();
+              }
+            } else {
+              return noGroupsWidget();
+            }
+          } else {
+            return const Center(
+                child:
+                    CircularProgressIndicator(color: AppColors.primaryColor));
+          }
+        });
+  }
+
+  noGroupsWidget() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 25),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          GestureDetector(
+            onTap: () {
+              popUpDialog(context);
+            },
+            child: Icon(
+              Icons.add_circle,
+              color: Colors.grey[700],
+              size: 75,
             ),
-            Tab(
-              icon: Icon(Icons.groups),
-            ),
-          ],
-        ),
-      ),
-      drawer: const Drawer(
-        child: DrawerTile(),
-      ),
-      body: TabBarView(
-        controller: _tabController,
-        children: const <Widget>[
-          ChatsScreen(),
-          GroupsScreen(),
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          Text(
+            "You've not joined any groups, tap on the add icon to create a group or also search from top search button.",
+            textAlign: TextAlign.center,
+            style: GoogleFonts.ubuntu(),
+          )
         ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          popUpDialog(context);
-        },
-        elevation: 0,
-        backgroundColor: AppColors.primaryColor,
-        child: const Icon(
-          Icons.add,
-          color: Colors.white,
-          size: 30,
-        ),
       ),
     );
   }

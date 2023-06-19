@@ -6,14 +6,11 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
-
-import '../../../shared/constants/app_colors.dart';
+import '../../../shared/styles/app_colors.dart';
 import '../../../widgets/widgets.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
-
-  static const String routeName = "SignupScreen";
 
   @override
   State<SignupScreen> createState() => _SignupScreenState();
@@ -51,8 +48,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       SizedBox(
                           height: MediaQuery.of(context).size.height * 0.01),
                       Text("Create your account now to chat and explore",
-                          style: GoogleFonts.novaFlat(
-                              fontSize: 15.sp, color: Colors.black45)),
+                          style: Theme.of(context).textTheme.bodySmall),
                       Image.asset("assets/images/register.png"),
                       TextFormField(
                         validator: (value) {
@@ -64,6 +60,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         },
                         decoration: textInoutDecoration.copyWith(
                             labelText: "UserName",
+                            labelStyle: Theme.of(context).textTheme.bodySmall,
                             prefixIcon: const Icon(
                               Icons.person,
                               color: AppColors.primaryColor,
@@ -81,13 +78,14 @@ class _SignupScreenState extends State<SignupScreen> {
                       TextFormField(
                         validator: (value) {
                           return RegExp(
-                                      r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                                      r"^[a-zA-Z0-9.a-zA-Z0-9!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
                                   .hasMatch(value!)
                               ? null
                               : "Please enter a valid email";
                         },
                         decoration: textInoutDecoration.copyWith(
                             labelText: "Email",
+                            labelStyle: Theme.of(context).textTheme.bodySmall,
                             prefixIcon: const Icon(
                               Icons.email,
                               color: AppColors.primaryColor,
@@ -104,15 +102,22 @@ class _SignupScreenState extends State<SignupScreen> {
                           height: MediaQuery.of(context).size.height * 0.02),
                       TextFormField(
                         validator: (value) {
-                          if (value!.length < 6) {
-                            return "Password must be at least 6 characters";
+                          RegExp regex = RegExp(
+                              r"^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$");
+                          if (value!.isEmpty) {
+                            return 'Please enter password';
                           } else {
-                            return null;
+                            if (!regex.hasMatch(value)) {
+                              return 'Enter valid password';
+                            } else {
+                              return null;
+                            }
                           }
                         },
                         obscureText: isVisible,
                         decoration: textInoutDecoration.copyWith(
                             labelText: "Password",
+                            labelStyle: Theme.of(context).textTheme.bodySmall,
                             prefixIcon: const Icon(
                               Icons.lock,
                               color: AppColors.primaryColor,
@@ -163,8 +168,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       Text.rich(
                         TextSpan(
                             text: "Already have an account? ",
-                            style: GoogleFonts.ubuntu(
-                                color: Colors.black, fontSize: 14),
+                            style: Theme.of(context).textTheme.bodySmall,
                             children: <TextSpan>[
                               TextSpan(
                                   text: "Sign In",
@@ -174,8 +178,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                       decoration: TextDecoration.underline),
                                   recognizer: TapGestureRecognizer()
                                     ..onTap = () {
-                                      Navigator.pushNamed(
-                                          context, LoginScreen.routeName);
+                                      nextScreenReplace(context, const LoginScreen());
                                     }),
                             ]),
                       )
@@ -192,22 +195,56 @@ class _SignupScreenState extends State<SignupScreen> {
       setState(() {
         _isLoading = true;
       });
-      await authServices
-          .registerUserEmailAndPassword(fullName, email, password)
-          .then((value) async {
-        if (value == true) {
-          await HelperFunctions.saveUserLoggedInStatus(true);
-          await HelperFunctions.saveUserNameSp(fullName);
-          await HelperFunctions.saveUserEmailSp(email).then((value) {
-            Navigator.pushReplacementNamed(context, HomeLayout.routeName);
-          });
-        } else {
-          showSnackBar(context, Colors.red, value);
-          setState(() {
-            _isLoading = false;
-          });
-        }
-      });
+        await authServices
+            .registerUserEmailAndPassword(fullName, email, password)
+            .then((value) async {
+          if (value == true) {
+            await HelperFunctions.saveUserLoggedInStatus(true);
+            await HelperFunctions.saveUserNameSp(fullName);
+            await HelperFunctions.saveUserEmailSp(email).then((value) {
+              nextScreenReplace(context, const HomeLayout());
+            });
+          } else {
+            showSnackBar(context, Colors.red, value);
+            setState(() {
+              _isLoading = false;
+            });
+          }
+        });
     }
   }
+
+  // register() async {
+  //   if (formKey.currentState!.validate()) {
+  //     setState(() {
+  //       _isLoading = true;
+  //     });
+  //     // check if user name already exists
+  //     QuerySnapshot querySnapshot =
+  //     await DatabaseServices().searchUsersByName(fullName);
+  //     if (querySnapshot.docs.isEmpty) {
+  //       await authServices
+  //           .registerUserEmailAndPassword(fullName, email, password)
+  //           .then((value) async {
+  //         if (value == true) {
+  //           await HelperFunctions.saveUserLoggedInStatus(true);
+  //           await HelperFunctions.saveUserNameSp(fullName);
+  //           await HelperFunctions.saveUserEmailSp(email).then((value) {
+  //             Navigator.pushReplacementNamed(context, HomeLayout.routeName);
+  //           });
+  //         } else {
+  //           showSnackBar(context, Colors.red, value);
+  //           setState(() {
+  //             _isLoading = false;
+  //           });
+  //         }
+  //       });
+  //     } else {
+  //       showSnackBar(context, Colors.red, "Username already exists");
+  //       setState(() {
+  //         _isLoading = false;
+  //       });
+  //     }
+  //   }
+  // }
 }

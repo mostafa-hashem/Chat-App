@@ -1,21 +1,18 @@
-import 'package:chat_app/layout/home_layout.dart';
-import 'package:chat_app/shared/constants/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../helper/helper_functions.dart';
-import '../../services/auth_services.dart';
-import '../auth/login/login_screen.dart';
+import '../../widgets/drawer_tile.dart';
 
 class ProfileScreen extends StatefulWidget {
-  static const String routeName = "ProfileScreen";
+  const ProfileScreen({super.key});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  AuthServices authService = AuthServices();
+
   String userName = '';
   String email = '';
 
@@ -42,115 +39,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        toolbarHeight: 80,
-        elevation: 0,
-        centerTitle: true,
-        backgroundColor: AppColors.primaryColor,
         title: Text(
           "Profile",
           style:
               GoogleFonts.novaSquare(fontSize: 25, fontWeight: FontWeight.bold),
         ),
       ),
-      drawer: Drawer(
-        child: ListView(
-          padding: const EdgeInsets.symmetric(vertical: 50),
-          children: <Widget>[
-            Icon(
-              Icons.account_circle,
-              size: 150,
-              color: Colors.grey[700],
-            ),
-            SizedBox(
-              height: MediaQuery.of(context).size.height * 0.02,
-            ),
-            Text(
-              userName,
-              textAlign: TextAlign.center,
-              style:
-                  GoogleFonts.ubuntu(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(
-              height: MediaQuery.of(context).size.height * 0.02,
-            ),
-            const Divider(
-              height: 2,
-            ),
-            ListTile(
-              onTap: () {
-                Navigator.pop(context);
-              },
-              selectedColor: AppColors.primaryColor,
-              selected: true,
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-              leading: const Icon(Icons.person),
-              title: Text(
-                "Profile",
-                style: GoogleFonts.novaFlat(
-                    color: Colors.black, fontWeight: FontWeight.w500),
-              ),
-            ),
-            ListTile(
-              onTap: () {
-                Navigator.pushNamed(context, HomeLayout.routeName);
-              },
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-              leading: const Icon(Icons.group),
-              title: Text(
-                "Groups",
-                style: GoogleFonts.novaFlat(
-                    color: Colors.black, fontWeight: FontWeight.w500),
-              ),
-            ),
-            ListTile(
-              onTap: () async {
-                showDialog(
-                    barrierDismissible: false,
-                    context: context,
-                    builder: (context) {
-                      return AlertDialog(
-                        title: const Text("Logout"),
-                        content: const Text("Are you sure you want to logout?"),
-                        actions: [
-                          IconButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              icon: const Icon(
-                                Icons.cancel,
-                                color: Colors.red,
-                              )),
-                          IconButton(
-                              onPressed: () {
-                                authService.signOut().whenComplete(() {
-                                  Navigator.of(context).pushAndRemoveUntil(
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              const LoginScreen()),
-                                      (route) => false);
-                                });
-                              },
-                              icon: const Icon(
-                                Icons.done,
-                                color: Colors.green,
-                              )),
-                        ],
-                      );
-                    });
-              },
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-              leading: const Icon(Icons.exit_to_app),
-              title: Text(
-                "Logout",
-                style: GoogleFonts.novaFlat(
-                    color: Colors.black, fontWeight: FontWeight.w500),
-              ),
-            ),
-          ],
-        ),
+      drawer: const Drawer(
+        child: DrawerTile(),
       ),
       body: Container(
         padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 170),
@@ -170,11 +66,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
               children: [
                 Text(
                   "User Name: ",
-                  style: GoogleFonts.ubuntu(),
+                  style: GoogleFonts.ubuntu(fontSize: 15.sp),
                 ),
                 Text(
                   userName,
-                  style: GoogleFonts.ubuntu(),
+                  style: GoogleFonts.ubuntu(fontSize: 15.sp),
                 )
               ],
             ),
@@ -186,11 +82,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
               children: [
                 Text(
                   "Email: ",
-                  style: GoogleFonts.ubuntu(),
+                  style: GoogleFonts.ubuntu(fontSize: 15.sp),
                 ),
                 Text(
                   email,
-                  style: GoogleFonts.ubuntu(),
+                  style: GoogleFonts.ubuntu(fontSize: 15.sp),
                 )
               ],
             )

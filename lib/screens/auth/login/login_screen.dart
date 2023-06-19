@@ -1,5 +1,5 @@
+import 'package:chat_app/layout/home_layout.dart';
 import 'package:chat_app/services/database_services.dart';
-import 'package:chat_app/shared/constants/app_colors.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
@@ -7,15 +7,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../helper/helper_functions.dart';
-import '../../../layout/home_layout.dart';
 import '../../../services/auth_services.dart';
+import '../../../shared/styles/app_colors.dart';
 import '../../../widgets/widgets.dart';
 import 'package:chat_app/screens/auth/signup/signup_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
-
-  static const String routeName = "LoginScreen";
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -51,19 +49,19 @@ class _LoginScreenState extends State<LoginScreen> {
                       SizedBox(
                           height: MediaQuery.of(context).size.height * 0.01),
                       Text("Login now to see what they are talking!",
-                          style: GoogleFonts.novaFlat(
-                              fontSize: 15.sp, color: Colors.black45)),
+                          style: Theme.of(context).textTheme.bodySmall),
                       Image.asset("assets/images/login.png"),
                       TextFormField(
                         validator: (value) {
                           return RegExp(
-                                      r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                                      r"^[a-zA-Z0-9.a-zA-Z0-9!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
                                   .hasMatch(value!)
                               ? null
                               : "Please enter a valid email";
                         },
                         decoration: textInoutDecoration.copyWith(
                             labelText: "Email",
+                            labelStyle: Theme.of(context).textTheme.bodySmall,
                             prefixIcon: const Icon(
                               Icons.email,
                               color: AppColors.primaryColor,
@@ -89,6 +87,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         obscureText: isVisible,
                         decoration: textInoutDecoration.copyWith(
                             labelText: "Password",
+                            labelStyle: Theme.of(context).textTheme.bodySmall,
                             prefixIcon: const Icon(
                               Icons.lock,
                               color: AppColors.primaryColor,
@@ -139,8 +138,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       Text.rich(
                         TextSpan(
                             text: "Don't have an account? ",
-                            style: GoogleFonts.ubuntu(
-                                color: Colors.black, fontSize: 14),
+                            style: Theme.of(context).textTheme.bodySmall,
                             children: <TextSpan>[
                               TextSpan(
                                   text: "Sign Up",
@@ -150,8 +148,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       decoration: TextDecoration.underline),
                                   recognizer: TapGestureRecognizer()
                                     ..onTap = () {
-                                      Navigator.pushNamed(
-                                          context, SignupScreen.routeName);
+                                      nextScreenReplace(context, const SignupScreen());
                                     }),
                             ]),
                       )
@@ -180,7 +177,7 @@ class _LoginScreenState extends State<LoginScreen> {
           await HelperFunctions.saveUserEmailSp(email);
           await HelperFunctions.saveUserNameSp(snapshot.docs[0]['fullName'])
               .then((value) {
-            Navigator.pushReplacementNamed(context, HomeLayout.routeName);
+            nextScreenReplace(context, const HomeLayout());
           });
         } else {
           showSnackBar(context, Colors.red, value);

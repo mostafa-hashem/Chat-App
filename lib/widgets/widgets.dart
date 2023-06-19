@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-var textInoutDecoration = InputDecoration(
-  labelStyle:
-      GoogleFonts.ubuntu(color: Colors.black, fontWeight: FontWeight.w300),
-  focusedBorder: const OutlineInputBorder(
+var textInoutDecoration = const InputDecoration(
+  focusedBorder: OutlineInputBorder(
     borderSide: BorderSide(color: Color(0xFFee7b64), width: 2),
   ),
-  enabledBorder: const OutlineInputBorder(
+  enabledBorder: OutlineInputBorder(
     borderSide: BorderSide(color: Color(0xFFee7b64), width: 2),
   ),
-  errorBorder: const OutlineInputBorder(
+  errorBorder: OutlineInputBorder(
     borderSide: BorderSide(color: Color(0xFFee7b64), width: 2),
   ),
 );
@@ -36,3 +34,12 @@ void nextScreenReplace(context, page) {
   Navigator.pushReplacement(
       context, MaterialPageRoute(builder: (context) => page));
 }
+
+String getId(String res) {
+  return res.substring(0, res.indexOf("_"));
+}
+
+String getName(String res) {
+  return res.substring(res.indexOf("_") + 1);
+}
+
