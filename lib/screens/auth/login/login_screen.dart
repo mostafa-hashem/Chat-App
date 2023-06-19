@@ -26,6 +26,7 @@ class _LoginScreenState extends State<LoginScreen> {
   bool isVisible = true;
   bool _isLoading = false;
   AuthServices authServices = AuthServices();
+  User? user;
 
   @override
   Widget build(BuildContext context) {
@@ -148,7 +149,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                       decoration: TextDecoration.underline),
                                   recognizer: TapGestureRecognizer()
                                     ..onTap = () {
-                                      nextScreenReplace(context, const SignupScreen());
+                                      nextScreenReplace(
+                                          context, const SignupScreen());
                                     }),
                             ]),
                       )
@@ -160,6 +162,41 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+  // login() async {
+  //   if (formKey.currentState!.validate()) {
+  //     setState(() {
+  //       _isLoading = true;
+  //     });
+  //
+  //     final signInResult =
+  //         await authServices.signInWithEmailAndPassword(email, password);
+  //
+  //     if (signInResult == true) {
+  //       final snapshot =
+  //           await DatabaseServices(uid: FirebaseAuth.instance.currentUser!.uid)
+  //               .gettingUserData(email);
+  //       print("Firebase: ${FirebaseAuth.instance.currentUser!.emailVerified}");
+  //       if (FirebaseAuth.instance.currentUser!.emailVerified) {
+  //         await HelperFunctions.saveUserLoggedInStatus(true);
+  //         await HelperFunctions.saveUserEmailSp(email);
+  //         await HelperFunctions.saveUserNameSp(snapshot.docs[0]['fullName']);
+  //         _isLoading = false;
+  //         nextScreenReplace(context, const HomeLayout());
+  //       } else {
+  //         showSnackBar(context, Colors.red, 'Please verify your email');
+  //         setState(() {
+  //           _isLoading = false;
+  //         });
+  //       }
+  //     } else {
+  //       showSnackBar(context, Colors.red, signInResult);
+  //       setState(() {
+  //         _isLoading = false;
+  //       });
+  //     }
+  //   }
+  // }
+
   login() async {
     if (formKey.currentState!.validate()) {
       setState(() {
@@ -169,16 +206,24 @@ class _LoginScreenState extends State<LoginScreen> {
           .signInWithEmailAndPassword(email, password)
           .then((value) async {
         if (value == true) {
-          QuerySnapshot snapshot = await DatabaseServices(
+          DocumentSnapshot snapshot = await DatabaseServices(
                   uid: FirebaseAuth.instance.currentUser!.uid)
-              .gettingUserData(email);
-          // saving the values to our shared preferences
-          await HelperFunctions.saveUserLoggedInStatus(true);
-          await HelperFunctions.saveUserEmailSp(email);
-          await HelperFunctions.saveUserNameSp(snapshot.docs[0]['fullName'])
-              .then((value) {
-            nextScreenReplace(context, const HomeLayout());
-          });
+              .gettingUserData();
+          if (FirebaseAuth.instance.currentUser!.emailVerified) {
+            // saving the values to our shared preferences
+            await HelperFunctions.saveUserLoggedInStatus(true);
+            await HelperFunctions.saveUserEmailSp(email);
+            var fullName = (snapshot.data() as Map<String, dynamic>)['fullName'];
+            await HelperFunctions.saveUserNameSp(fullName)
+                .then((value) {
+              nextScreenReplace(context, const HomeLayout());
+            });
+          } else {
+            showSnackBar(context, Colors.red, 'Please verify your email');
+            setState(() {
+              _isLoading = false;
+            });
+          }
         } else {
           showSnackBar(context, Colors.red, value);
           setState(() {

@@ -1,16 +1,19 @@
 import 'package:chat_app/helper/helper_functions.dart';
-import 'package:chat_app/layout/home_layout.dart';
 import 'package:chat_app/screens/auth/login/login_screen.dart';
 import 'package:chat_app/services/auth_services.dart';
+import 'package:chat_app/services/database_services.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 import '../../../shared/styles/app_colors.dart';
 import '../../../widgets/widgets.dart';
 
 class SignupScreen extends StatefulWidget {
-  const SignupScreen({super.key});
+  const SignupScreen({Key? key}) : super(key: key);
 
   @override
   State<SignupScreen> createState() => _SignupScreenState();
@@ -43,12 +46,17 @@ class _SignupScreenState extends State<SignupScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Text("Chatoo",
-                          style: GoogleFonts.novaFlat(fontSize: 30.sp)),
+                      Text(
+                        "Chatoo",
+                        style: GoogleFonts.novaFlat(fontSize: 30.sp),
+                      ),
                       SizedBox(
-                          height: MediaQuery.of(context).size.height * 0.01),
-                      Text("Create your account now to chat and explore",
-                          style: Theme.of(context).textTheme.bodySmall),
+                        height: MediaQuery.of(context).size.height * 0.01,
+                      ),
+                      Text(
+                        "Create your account now to chat and explore",
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
                       Image.asset("assets/images/register.png"),
                       TextFormField(
                         validator: (value) {
@@ -59,12 +67,13 @@ class _SignupScreenState extends State<SignupScreen> {
                           }
                         },
                         decoration: textInoutDecoration.copyWith(
-                            labelText: "UserName",
-                            labelStyle: Theme.of(context).textTheme.bodySmall,
-                            prefixIcon: const Icon(
-                              Icons.person,
-                              color: AppColors.primaryColor,
-                            )),
+                          labelText: "UserName",
+                          labelStyle: Theme.of(context).textTheme.bodySmall,
+                          prefixIcon: const Icon(
+                            Icons.person,
+                            color: AppColors.primaryColor,
+                          ),
+                        ),
                         keyboardType: TextInputType.name,
                         textInputAction: TextInputAction.next,
                         onChanged: (value) {
@@ -74,7 +83,8 @@ class _SignupScreenState extends State<SignupScreen> {
                         },
                       ),
                       SizedBox(
-                          height: MediaQuery.of(context).size.height * 0.02),
+                        height: MediaQuery.of(context).size.height * 0.02,
+                      ),
                       TextFormField(
                         validator: (value) {
                           return RegExp(
@@ -84,12 +94,13 @@ class _SignupScreenState extends State<SignupScreen> {
                               : "Please enter a valid email";
                         },
                         decoration: textInoutDecoration.copyWith(
-                            labelText: "Email",
-                            labelStyle: Theme.of(context).textTheme.bodySmall,
-                            prefixIcon: const Icon(
-                              Icons.email,
-                              color: AppColors.primaryColor,
-                            )),
+                          labelText: "Email",
+                          labelStyle: Theme.of(context).textTheme.bodySmall,
+                          prefixIcon: const Icon(
+                            Icons.email,
+                            color: AppColors.primaryColor,
+                          ),
+                        ),
                         keyboardType: TextInputType.emailAddress,
                         textInputAction: TextInputAction.next,
                         onChanged: (value) {
@@ -99,7 +110,8 @@ class _SignupScreenState extends State<SignupScreen> {
                         },
                       ),
                       SizedBox(
-                          height: MediaQuery.of(context).size.height * 0.02),
+                        height: MediaQuery.of(context).size.height * 0.02,
+                      ),
                       TextFormField(
                         validator: (value) {
                           RegExp regex = RegExp(
@@ -116,27 +128,29 @@ class _SignupScreenState extends State<SignupScreen> {
                         },
                         obscureText: isVisible,
                         decoration: textInoutDecoration.copyWith(
-                            labelText: "Password",
-                            labelStyle: Theme.of(context).textTheme.bodySmall,
-                            prefixIcon: const Icon(
-                              Icons.lock,
-                              color: AppColors.primaryColor,
-                            ),
-                            suffixIcon: InkWell(
-                                onTap: () {
-                                  setState(() {
-                                    isVisible = !isVisible;
-                                  });
-                                },
-                                child: isVisible
-                                    ? const Icon(
-                                        Icons.visibility,
-                                        color: AppColors.primaryColor,
-                                      )
-                                    : const Icon(
-                                        Icons.visibility_off,
-                                        color: AppColors.primaryColor,
-                                      ))),
+                          labelText: "Password",
+                          labelStyle: Theme.of(context).textTheme.bodySmall,
+                          prefixIcon: const Icon(
+                            Icons.lock,
+                            color: AppColors.primaryColor,
+                          ),
+                          suffixIcon: InkWell(
+                            onTap: () {
+                              setState(() {
+                                isVisible = !isVisible;
+                              });
+                            },
+                            child: isVisible
+                                ? const Icon(
+                                    Icons.visibility,
+                                    color: AppColors.primaryColor,
+                                  )
+                                : const Icon(
+                                    Icons.visibility_off,
+                                    color: AppColors.primaryColor,
+                                  ),
+                          ),
+                        ),
                         keyboardType: TextInputType.visiblePassword,
                         textInputAction: TextInputAction.done,
                         onChanged: (value) {
@@ -146,42 +160,54 @@ class _SignupScreenState extends State<SignupScreen> {
                         },
                       ),
                       SizedBox(
-                          height: MediaQuery.of(context).size.height * 0.02),
+                        height: MediaQuery.of(context).size.height * 0.02,
+                      ),
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
-                            onPressed: () {
-                              register();
-                            },
-                            style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.primaryColor,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(30))),
-                            child: Text(
-                              "Sign Up",
-                              style: GoogleFonts.novaSquare(
-                                  fontSize: 20, fontWeight: FontWeight.bold),
-                            )),
+                          onPressed: () {
+                            // Send verification email
+                            sendVerificationEmail();
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primaryColor,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                          ),
+                          child: Text(
+                            "Sign Up",
+                            style: GoogleFonts.novaSquare(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
                       ),
                       SizedBox(
-                          height: MediaQuery.of(context).size.height * 0.02),
+                        height: MediaQuery.of(context).size.height * 0.02,
+                      ),
                       Text.rich(
                         TextSpan(
-                            text: "Already have an account? ",
-                            style: Theme.of(context).textTheme.bodySmall,
-                            children: <TextSpan>[
-                              TextSpan(
-                                  text: "Sign In",
-                                  style: GoogleFonts.ubuntu(
-                                      color: Colors.blue,
-                                      fontSize: 18,
-                                      decoration: TextDecoration.underline),
-                                  recognizer: TapGestureRecognizer()
-                                    ..onTap = () {
-                                      nextScreenReplace(context, const LoginScreen());
-                                    }),
-                            ]),
-                      )
+                          text: "Already have an account? ",
+                          style: Theme.of(context).textTheme.bodySmall,
+                          children: <TextSpan>[
+                            TextSpan(
+                              text: "Sign In",
+                              style: GoogleFonts.ubuntu(
+                                color: Colors.blue,
+                                fontSize: 18,
+                                decoration: TextDecoration.underline,
+                              ),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () {
+                                  nextScreenReplace(
+                                      context, const LoginScreen());
+                                },
+                            ),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -190,61 +216,48 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
-  register() async {
+  sendVerificationEmail() async {
     if (formKey.currentState!.validate()) {
       setState(() {
         _isLoading = true;
       });
-        await authServices
-            .registerUserEmailAndPassword(fullName, email, password)
-            .then((value) async {
-          if (value == true) {
-            await HelperFunctions.saveUserLoggedInStatus(true);
-            await HelperFunctions.saveUserNameSp(fullName);
-            await HelperFunctions.saveUserEmailSp(email).then((value) {
-              nextScreenReplace(context, const HomeLayout());
-            });
-          } else {
-            showSnackBar(context, Colors.red, value);
-            setState(() {
-              _isLoading = false;
-            });
-          }
+
+      try {
+        await Firebase.initializeApp();
+
+        // Create user with email and password
+        UserCredential userCredential =
+            await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: email,
+          password: password,
+        );
+
+        await userCredential.user!.sendEmailVerification();
+        await DatabaseServices(uid: FirebaseAuth.instance.currentUser!.uid)
+            .savingUserData(fullName, email);
+        await HelperFunctions.saveUserLoggedInStatus(true);
+        await HelperFunctions.saveUserNameSp(fullName);
+        await HelperFunctions.saveUserEmailSp(email);
+
+        nextScreenReplace(context, const LoginScreen());
+        // Show verification message
+        showSnackBar(
+          context,
+          Colors.green,
+          "Registration successful! Please check your email for verification.",
+        );
+
+        setState(() {
+          _isLoading = false;
         });
+
+        // formKey.currentState!.reset();
+      } catch (error) {
+        showSnackBar(context, Colors.red, error.toString());
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
-
-  // register() async {
-  //   if (formKey.currentState!.validate()) {
-  //     setState(() {
-  //       _isLoading = true;
-  //     });
-  //     // check if user name already exists
-  //     QuerySnapshot querySnapshot =
-  //     await DatabaseServices().searchUsersByName(fullName);
-  //     if (querySnapshot.docs.isEmpty) {
-  //       await authServices
-  //           .registerUserEmailAndPassword(fullName, email, password)
-  //           .then((value) async {
-  //         if (value == true) {
-  //           await HelperFunctions.saveUserLoggedInStatus(true);
-  //           await HelperFunctions.saveUserNameSp(fullName);
-  //           await HelperFunctions.saveUserEmailSp(email).then((value) {
-  //             Navigator.pushReplacementNamed(context, HomeLayout.routeName);
-  //           });
-  //         } else {
-  //           showSnackBar(context, Colors.red, value);
-  //           setState(() {
-  //             _isLoading = false;
-  //           });
-  //         }
-  //       });
-  //     } else {
-  //       showSnackBar(context, Colors.red, "Username already exists");
-  //       setState(() {
-  //         _isLoading = false;
-  //       });
-  //     }
-  //   }
-  // }
 }

@@ -21,11 +21,15 @@ class DatabaseServices {
     });
   }
 
+  Future updateEmailVerifiedStatus(bool status) async {
+    await userCollection.doc(uid).update({
+      "emailVerified": status,
+    });
+  }
+
   //get user data
-  Future gettingUserData(String email) async {
-    QuerySnapshot snapshot =
-        await userCollection.where("email", isEqualTo: email).get();
-    return snapshot;
+  Future gettingUserData() async {
+    return await userCollection.doc(uid).get();
   }
 
   //get user groups
