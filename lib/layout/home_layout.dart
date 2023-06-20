@@ -1,10 +1,11 @@
+import 'package:chat_app/screens/search/search_on_friends_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../helper/helper_functions.dart';
-import '../screens/chats/chat_screen.dart';
+import '../screens/chats/chats_screen.dart';
 import '../screens/groups/groups_screen.dart';
-import '../screens/search/search_screen.dart';
+import '../screens/search/search_on_grops_screen.dart';
 import '../services/auth_services.dart';
 import '../services/database_services.dart';
 import '../shared/styles/app_colors.dart';
@@ -36,8 +37,6 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
     _tabController = TabController(length: 2, vsync: this);
     _tabController.addListener(_handleTabChange);
   }
-
-
 
   void _handleTabChange() {
     setState(() {
@@ -80,7 +79,9 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
         actions: [
           IconButton(
               onPressed: () {
-                nextScreen(context, const SearchScreen());
+                _tabController.index == 0
+                    ? nextScreen(context, const SearchOnFriendsScreen())
+                    : nextScreen(context, const SearchOnGroupsScreen());
               },
               icon: const Icon(
                 Icons.search,

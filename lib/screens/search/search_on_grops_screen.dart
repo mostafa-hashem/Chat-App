@@ -9,15 +9,15 @@ import '../../services/database_services.dart';
 import '../../shared/styles/app_colors.dart';
 import '../groups/groups_chat_screen.dart';
 
-class SearchScreen extends StatefulWidget {
-  const SearchScreen({super.key});
+class SearchOnGroupsScreen extends StatefulWidget {
+  const SearchOnGroupsScreen({super.key});
 
   @override
-  State<SearchScreen> createState() => _SearchScreenState();
+  State<SearchOnGroupsScreen> createState() => _SearchOnGroupsScreenState();
 }
 
-class _SearchScreenState extends State<SearchScreen> {
-  TextEditingController searchController = TextEditingController();
+class _SearchOnGroupsScreenState extends State<SearchOnGroupsScreen> {
+  TextEditingController searchOnGroupsController = TextEditingController();
   bool isLoading = false;
   QuerySnapshot? searchSnapshot;
   bool hasUserSearched = false;
@@ -73,7 +73,7 @@ class _SearchScreenState extends State<SearchScreen> {
               children: [
                 Expanded(
                   child: TextField(
-                    controller: searchController,
+                    controller: searchOnGroupsController,
                     style: GoogleFonts.ubuntu(color: Colors.white),
                     decoration: InputDecoration(
                         border: InputBorder.none,
@@ -84,7 +84,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 ),
                 GestureDetector(
                   onTap: () {
-                    searchMethod();
+                    searchOnGroupsMethod();
                   },
                   child: Container(
                     width: 40,
@@ -112,13 +112,13 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
-  searchMethod() async {
-    if (searchController.text.isNotEmpty) {
+  searchOnGroupsMethod() async {
+    if (searchOnGroupsController.text.isNotEmpty) {
       setState(() {
         isLoading = true;
       });
       await DatabaseServices()
-          .searchGroupsByName(searchController.text)
+          .searchGroupsByName(searchOnGroupsController.text)
           .then((snapshot) {
         setState(() {
           searchSnapshot = snapshot;
@@ -142,7 +142,11 @@ class _SearchScreenState extends State<SearchScreen> {
                 searchSnapshot!.docs[index]["admin"],
               );
             })
-        : Container();
+        : Center(
+            child: Text(
+            "No results found.",
+            style: Theme.of(context).textTheme.bodyMedium,
+          ));
   }
 
   joinedOrNot(String userName, String groupId, String groupName,
@@ -165,7 +169,7 @@ class _SearchScreenState extends State<SearchScreen> {
         isJoined
             ? nextScreen(
                 context,
-            GroupsChatScreen(
+                GroupsChatScreen(
                     groupId: groupId, groupName: groupName, userName: userName))
             : null;
       },

@@ -87,7 +87,7 @@ class DatabaseServices {
   }
 
   //search on users by name
-  searchUsersByName(String fullName) {
+  searchFriendsByName(String fullName) {
     return userCollection.where("fullName", isEqualTo: fullName).get();
   }
 
@@ -97,6 +97,18 @@ class DatabaseServices {
     DocumentSnapshot documentSnapshot = await userDocumentReference.get();
     List<dynamic> groups = await documentSnapshot['groups'];
     if (groups.contains("${groupId}_$groupName")) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  Future<bool> isUserFriend(
+      String friendName, String friendId) async {
+    DocumentReference userDocumentReference = userCollection.doc(uid);
+    DocumentSnapshot documentSnapshot = await userDocumentReference.get();
+    List<dynamic> groups = await documentSnapshot['friends'];
+    if (groups.contains("${friendId}_$friendName")) {
       return true;
     } else {
       return false;
@@ -132,10 +144,38 @@ class DatabaseServices {
     }
   }
 
-  // send message
-  sendMessage(String groupId, Map<String, dynamic> chatMessageData) async {
+// toggling the friend or not
+  Future toggleFriendOrNot(
+      String userId, String friendName) async {
+    DocumentReference userDocumentReference = userCollection.doc(uid);
+    DocumentSnapshot documentSnapshot = await userDocumentReference.get();
+    List<dynamic> friends = await documentSnapshot['friends'];
+
+    // if user has our groups -> then remove then or also in other part re join
+    if (friends.contains("${userId}_$friendName")) {
+      await userDocumentReference.update({
+        "friends": FieldValue.arrayRemove(["${uid}_$friendName"]),
+      });
+    } else {
+      await userDocumentReference.update({
+        "friends": FieldValue.arrayUnion(["${uid}_$friendName"])
+      });
+    }
+  }
+
+  // send message to group
+  sendMessageToGroup(String groupId, Map<String, dynamic> chatMessageData) async {
     groupCollection.doc(groupId).collection("messages").add(chatMessageData);
     groupCollection.doc(groupId).update({
+      "recentMessage": chatMessageData['message'],
+      "recentMessageSender": chatMessageData['sender'],
+      "recentMessageTime": chatMessageData['time'].toString(),
+    });
+  }
+
+  sendMessageToFriend(String userId, Map<String, dynamic> chatMessageData) async {
+    userCollection.doc(userId).collection("messages").add(chatMessageData);
+    groupCollection.doc(userId).update({
       "recentMessage": chatMessageData['message'],
       "recentMessageSender": chatMessageData['sender'],
       "recentMessageTime": chatMessageData['time'].toString(),

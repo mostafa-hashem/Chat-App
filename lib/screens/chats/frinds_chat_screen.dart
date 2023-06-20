@@ -8,27 +8,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import '../../widgets/widgets.dart';
 import 'package:flutter/foundation.dart' as foundation;
-import 'group_info.dart';
 
-class GroupsChatScreen extends StatefulWidget {
-  const GroupsChatScreen({
+class FriendsChatScreen extends StatefulWidget {
+  const FriendsChatScreen({
     Key? key,
-    required this.groupId,
-    required this.groupName,
-    required this.userName,
+    required this.friendId,
+    required this.friendName,
   }) : super(key: key);
 
-  final String userName;
-  final String groupId;
-  final String groupName;
+  final String friendName;
+  final String friendId;
 
   @override
-  State<GroupsChatScreen> createState() => _GroupsChatScreenState();
+  State<FriendsChatScreen> createState() => _FriendsChatScreenState();
 }
 
-class _GroupsChatScreenState extends State<GroupsChatScreen> {
+class _FriendsChatScreenState extends State<FriendsChatScreen> {
   TextEditingController messageController = TextEditingController();
   Stream<QuerySnapshot>? chats;
   String adminName = "";
@@ -55,12 +51,12 @@ class _GroupsChatScreenState extends State<GroupsChatScreen> {
   }
 
   getChatAndAdmin() {
-    DatabaseServices().getChats(widget.groupId).then((value) {
+    DatabaseServices().getChats(widget.friendId).then((value) {
       setState(() {
         chats = value;
       });
     });
-    DatabaseServices().getGroupAdmin(widget.groupId).then((value) {
+    DatabaseServices().getGroupAdmin(widget.friendId).then((value) {
       setState(() {
         adminName = value;
       });
@@ -73,20 +69,14 @@ class _GroupsChatScreenState extends State<GroupsChatScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          widget.groupName,
+          widget.friendName,
           style: GoogleFonts.ubuntu(fontWeight: FontWeight.bold),
         ),
         actions: [
           IconButton(
             onPressed: () {
-              nextScreen(
-                context,
-                GroupInfo(
-                  groupId: widget.groupId,
-                  groupName: widget.groupName,
-                  adminName: adminName,
-                ),
-              );
+
+
             },
             icon: const Icon(Icons.info),
           ),
@@ -145,7 +135,7 @@ class _GroupsChatScreenState extends State<GroupsChatScreen> {
                     color: Colors.transparent,
                     child: IconButton(
                         onPressed: () {
-                          sendMessageToGroup();
+                          // sendMessageToGroup();
                         },
                         icon: const Icon(
                           Icons.send,
@@ -208,19 +198,19 @@ class _GroupsChatScreenState extends State<GroupsChatScreen> {
         builder: (context, AsyncSnapshot snapshot) {
           return snapshot.hasData
               ? ListView.builder(
-                  itemCount: snapshot.data.docs.length,
-                  itemBuilder: (context, index) {
-                    return MessageTile(
-                      message: snapshot.data.docs[index]['message'],
-                      sender: snapshot.data.docs[index]['sender'],
-                      sentByMe: widget.userName ==
-                          snapshot.data.docs[index]['sender'],
-                      timeOfMessage: snapshot.data.docs[index]['time'],
-                      groupId: widget.groupId,
-                      messageId: snapshot.data.docs[index].id,
-                    );
-                  },
-                )
+            itemCount: snapshot.data.docs.length,
+            itemBuilder: (context, index) {
+              return MessageTile(
+                message: snapshot.data.docs[index]['message'],
+                sender: snapshot.data.docs[index]['sender'],
+                sentByMe: widget.friendName ==
+                    snapshot.data.docs[index]['sender'],
+                timeOfMessage: snapshot.data.docs[index]['time'],
+                groupId: widget.friendId,
+                messageId: snapshot.data.docs[index].id,
+              );
+            },
+          )
               : Container();
         },
       ),
@@ -231,10 +221,10 @@ class _GroupsChatScreenState extends State<GroupsChatScreen> {
     if (messageController.text.isNotEmpty) {
       Map<String, dynamic> chatMessageData = {
         "message": messageController.text,
-        "sender": widget.userName,
+        "sender": widget.friendName,
         "time": DateTime.now().millisecondsSinceEpoch,
       };
-      DatabaseServices().sendMessageToGroup(widget.groupId, chatMessageData);
+      DatabaseServices().sendMessageToGroup(widget.friendId, chatMessageData);
       setState(() {
         messageController.clear();
       });
