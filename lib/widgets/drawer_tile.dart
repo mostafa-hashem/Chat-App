@@ -4,10 +4,7 @@ import 'package:chat_app/shared/styles/app_colors.dart';
 import 'package:chat_app/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 import '../helper/helper_functions.dart';
-import '../layout/home_layout.dart';
-import '../shared/provider/app_provider.dart';
 
 class DrawerTile extends StatefulWidget {
   const DrawerTile({super.key});
@@ -43,7 +40,6 @@ class _DrawerTileState extends State<DrawerTile> {
 
   @override
   Widget build(BuildContext context) {
-    var provider = Provider.of<MyAppProvider>(context);
     return ListView(
       padding: const EdgeInsets.symmetric(vertical: 50),
       children: <Widget>[
@@ -69,9 +65,8 @@ class _DrawerTileState extends State<DrawerTile> {
         ListTile(
             onTap: () {
               nextScreen(context, ProfileScreen());
-              provider.drawerTileIndex = 0;
             },
-            selected: provider.drawerTileIndex == 0 ? true : false,
+            selected: true ,
             selectedColor: AppColors.primaryColor,
             contentPadding:
                 const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
@@ -80,22 +75,9 @@ class _DrawerTileState extends State<DrawerTile> {
                 style: Theme.of(context).textTheme.bodyMedium)),
         ListTile(
             onTap: () {
-              nextScreen(context, const HomeLayout());
-              provider.drawerTileIndex = 1;
-            },
-            selected: provider.drawerTileIndex == 1 ? true : false,
-            selectedColor: AppColors.primaryColor,
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-            leading: const Icon(Icons.home),
-            title: Text("Home",
-                style: Theme.of(context).textTheme.bodyMedium)),
-        ListTile(
-            onTap: () {
               nextScreen(context, SettingsTab());
-              provider.drawerTileIndex = 2;
             },
-            selected: provider.drawerTileIndex == 2 ? true : false,
+            selected:  true,
             selectedColor: AppColors.primaryColor,
             contentPadding:
                 const EdgeInsets.symmetric(horizontal: 20, vertical: 5),

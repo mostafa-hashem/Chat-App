@@ -5,7 +5,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 class AuthServices {
   final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
 
-
   //Login
   Future signInWithEmailAndPassword(String email, String password) async {
     try {
@@ -20,7 +19,6 @@ class AuthServices {
     }
   }
 
-
   //Register
   Future registerUserEmailAndPassword(
       String fullName, String email, String password) async {
@@ -28,6 +26,7 @@ class AuthServices {
       User user = (await firebaseAuth.createUserWithEmailAndPassword(
               email: email, password: password))
           .user!;
+      user.sendEmailVerification();
       if (user != null) {
         DatabaseServices(uid: user.uid).savingUserData(fullName, email);
         return true;
@@ -36,7 +35,6 @@ class AuthServices {
       return e.message;
     }
   }
-
 
 //Sign-out
   Future signOut() async {

@@ -30,12 +30,6 @@ class _GroupsScreenState extends State<GroupsScreen> {
       });
     });
 
-    await HelperFunctions.getUserEmailFromSp().then((value) {
-      setState(() {
-        email = value ?? "";
-      });
-    });
-
     //getting the list of snapshot from stream
     await DatabaseServices(uid: FirebaseAuth.instance.currentUser!.uid)
         .getUserGroups()

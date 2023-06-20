@@ -4,7 +4,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 class MyAppProvider extends ChangeNotifier {
   ThemeMode themeMode = ThemeMode.light;
   String language = 'en';
-  int drawerTileIndex = 1;
 
 
   void changeLanguage(String newLanguage) async {

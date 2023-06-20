@@ -17,10 +17,10 @@ void showSnackBar(BuildContext context, Color color, String text) {
     SnackBar(
       content: Text(
         text,
-        style: const TextStyle(fontSize: 14),
+        style: const TextStyle(fontSize: 15),
       ),
       backgroundColor: color,
-      duration: const Duration(seconds: 2),
+      duration: const Duration(seconds: 3),
     ),
   );
 }

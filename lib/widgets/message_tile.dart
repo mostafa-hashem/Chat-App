@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 
-
 class MessageTile extends StatefulWidget {
   final String message;
   final String sender;
@@ -112,7 +111,9 @@ class _MessageTileState extends State<MessageTile> {
                     topRight: Radius.circular(20),
                     bottomRight: Radius.circular(20),
                   ),
-            color: const Color(0xff8db4ad),
+            color: widget.sentByMe
+                ? const Color(0xffecae7d)
+                : const Color(0xff8db4ad),
           ),
           child: Column(
             crossAxisAlignment: widget.sentByMe

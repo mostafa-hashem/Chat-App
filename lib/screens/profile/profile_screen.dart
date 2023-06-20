@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../helper/helper_functions.dart';
-import '../../widgets/drawer_tile.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -44,9 +43,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
           style:
               GoogleFonts.novaSquare(fontSize: 25, fontWeight: FontWeight.bold),
         ),
-      ),
-      drawer: const Drawer(
-        child: DrawerTile(),
       ),
       body: Container(
         padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 170),

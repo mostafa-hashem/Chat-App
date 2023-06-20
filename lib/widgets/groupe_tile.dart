@@ -28,9 +28,9 @@ class _GroupTileState extends State<GroupTile> {
         nextScreen(
             context,
             GroupsChatScreen(
-              groupId: widget.groupId,
-              groupName: widget.groupName,
               userName: widget.userName,
+              groupName: widget.groupName,
+              groupId: widget.groupId,
             ));
       },
       child: Container(

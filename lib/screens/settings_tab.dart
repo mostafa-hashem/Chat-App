@@ -7,7 +7,6 @@ import 'package:provider/provider.dart';
 import '../helper/helper_functions.dart';
 import '../services/auth_services.dart';
 import '../shared/provider/app_provider.dart';
-import '../widgets/drawer_tile.dart';
 import '../widgets/language_bootom_sheet.dart';
 import '../widgets/theme_bottom_sheet.dart';
 import 'auth/login/login_screen.dart';
@@ -53,9 +52,6 @@ class _SettingsTabState extends State<SettingsTab> {
               ? Text("Settings", style: Theme.of(context).textTheme.bodyMedium)
               : Text("الإعدادات",
                   style: Theme.of(context).textTheme.bodyMedium),
-        ),
-        drawer: const Drawer(
-          child:DrawerTile(),
         ),
         body: Padding(
           padding: const EdgeInsets.all(25),

@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../helper/helper_functions.dart';
 import '../screens/chats/chat_screen.dart';
 import '../screens/groups/groups_screen.dart';
 import '../screens/search/search_screen.dart';
@@ -26,11 +27,26 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
   Stream? groups;
   bool _isLoading = false;
   late final TabController _tabController;
+  String appBarTitle = "Chats";
 
   @override
   void initState() {
     super.initState();
+    gettingUserData();
     _tabController = TabController(length: 2, vsync: this);
+    _tabController.addListener(_handleTabChange);
+  }
+
+
+
+  void _handleTabChange() {
+    setState(() {
+      if (_tabController.index == 0) {
+        appBarTitle = AppLocalizations.of(context)!.chats;
+      } else {
+        appBarTitle = AppLocalizations.of(context)!.groups;
+      }
+    });
   }
 
   @override
@@ -39,14 +55,26 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
     super.dispose();
   }
 
+  gettingUserData() async {
+    await HelperFunctions.getUserNameFromSp().then((value) {
+      setState(() {
+        userName = value ?? "";
+      });
+    });
+
+    await HelperFunctions.getUserEmailFromSp().then((value) {
+      setState(() {
+        email = value ?? "";
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          _tabController.index == 0
-              ? AppLocalizations.of(context)!.chats
-              : AppLocalizations.of(context)!.groups,
+          appBarTitle,
           style: Theme.of(context).textTheme.bodyMedium,
         ),
         actions: [
@@ -56,7 +84,7 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
               },
               icon: const Icon(
                 Icons.search,
-              ))
+              )),
         ],
         bottom: TabBar(
           controller: _tabController,
@@ -73,11 +101,15 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
       drawer: const Drawer(
         child: DrawerTile(),
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: const <Widget>[
-          ChatsScreen(),
-          GroupsScreen(),
+      body: Stack(
+        children: [
+          TabBarView(
+            controller: _tabController,
+            children: const <Widget>[
+              ChatsScreen(),
+              GroupsScreen(),
+            ],
+          ),
         ],
       ),
       floatingActionButton: FloatingActionButton(

@@ -1,14 +1,10 @@
 import 'package:chat_app/helper/helper_functions.dart';
 import 'package:chat_app/screens/auth/login/login_screen.dart';
 import 'package:chat_app/services/auth_services.dart';
-import 'package:chat_app/services/database_services.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 import '../../../shared/styles/app_colors.dart';
 import '../../../widgets/widgets.dart';
 
@@ -166,8 +162,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         width: double.infinity,
                         child: ElevatedButton(
                           onPressed: () {
-                            // Send verification email
-                            sendVerificationEmail();
+                            register();
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.primaryColor,
@@ -216,48 +211,73 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
-  sendVerificationEmail() async {
+  register() async {
     if (formKey.currentState!.validate()) {
       setState(() {
         _isLoading = true;
       });
-
-      try {
-        await Firebase.initializeApp();
-
-        // Create user with email and password
-        UserCredential userCredential =
-            await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: email,
-          password: password,
-        );
-
-        await userCredential.user!.sendEmailVerification();
-        await DatabaseServices(uid: FirebaseAuth.instance.currentUser!.uid)
-            .savingUserData(fullName, email);
-        await HelperFunctions.saveUserLoggedInStatus(true);
-        await HelperFunctions.saveUserNameSp(fullName);
-        await HelperFunctions.saveUserEmailSp(email);
-
-        nextScreenReplace(context, const LoginScreen());
-        // Show verification message
-        showSnackBar(
-          context,
-          Colors.green,
-          "Registration successful! Please check your email for verification.",
-        );
-
-        setState(() {
-          _isLoading = false;
-        });
-
-        // formKey.currentState!.reset();
-      } catch (error) {
-        showSnackBar(context, Colors.red, error.toString());
-        setState(() {
-          _isLoading = false;
-        });
-      }
+      await authServices
+          .registerUserEmailAndPassword(fullName, email, password)
+          .then((value) async {
+        if (value == true) {
+          await HelperFunctions.saveUserNameSp(fullName);
+          await HelperFunctions.saveUserEmailSp(email);
+          showSnackBar(
+            context,
+            Colors.green,
+            "Registration successful! Please check your email for verification.",
+          );
+          nextScreenReplace(context, const LoginScreen());
+        } else {
+          showSnackBar(context, Colors.red, value);
+          setState(() {
+            _isLoading = false;
+          });
+        }
+      });
     }
   }
+
+  // sendVerificationEmail() async {
+  //   if (formKey.currentState!.validate()) {
+  //     setState(() {
+  //       _isLoading = true;
+  //     });
+  //
+  //     try {
+  //       // Create user with email and password
+  //       UserCredential userCredential =
+  //           await FirebaseAuth.instance.createUserWithEmailAndPassword(
+  //         email: email,
+  //         password: password,
+  //       );
+  //
+  //       await userCredential.user!.sendEmailVerification();
+  //       await DatabaseServices(uid: FirebaseAuth.instance.currentUser!.uid)
+  //           .savingUserData(fullName, email);
+  //       // await HelperFunctions.saveUserLoggedInStatus(true);
+  //       await HelperFunctions.saveUserNameSp(fullName);
+  //       await HelperFunctions.saveUserEmailSp(email);
+  //
+  //       nextScreenReplace(context, const LoginScreen());
+  //       // Show verification message
+  //       showSnackBar(
+  //         context,
+  //         Colors.green,
+  //         "Registration successful! Please check your email for verification.",
+  //       );
+  //
+  //       setState(() {
+  //         _isLoading = false;
+  //       });
+  //
+  //       formKey.currentState!.reset();
+  //     } catch (error) {
+  //       showSnackBar(context, Colors.red, error.toString());
+  //       setState(() {
+  //         _isLoading = false;
+  //       });
+  //     }
+  //   }
+  // }
 }
