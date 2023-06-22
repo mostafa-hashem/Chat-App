@@ -1,7 +1,9 @@
 import 'package:chat_app/screens/search/search_on_friends_screen.dart';
+import 'package:chat_app/shared/provider/app_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import '../helper/helper_functions.dart';
 import '../screens/chats/friends_screen.dart';
 import '../screens/groups/groups_screen.dart';
@@ -70,13 +72,26 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    var provider = Provider.of<MyAppProvider>(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          appBarTitle,
-          style: Theme.of(context).textTheme.bodyMedium,
-        ),
         actions: [
+          IconButton(
+              onPressed: () {
+                showLanguageSheet(context);
+              },
+              icon: const Icon(
+                Icons.translate,
+              )),
+          IconButton(
+              onPressed: () {
+                showThemeSheet(context);
+              },
+              icon: Icon(
+                provider.themeMode == ThemeMode.light ?
+                Icons.light_mode
+                : Icons.dark_mode ,
+              )),
           IconButton(
               onPressed: () {
                 _tabController.index == 0
@@ -89,12 +104,12 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
         ],
         bottom: TabBar(
           controller: _tabController,
-          tabs: const <Widget>[
+          tabs: <Widget>[
             Tab(
-              icon: Icon(Icons.wechat_sharp),
+              child: Text("Chats", style:Theme.of(context).textTheme.bodySmall),
             ),
             Tab(
-              icon: Icon(Icons.groups),
+              child: Text("Groups", style:Theme.of(context).textTheme.bodySmall),
             ),
           ],
         ),

@@ -1,7 +1,7 @@
 import 'package:chat_app/services/database_services.dart';
 import 'package:chat_app/shared/provider/app_provider.dart';
 import 'package:chat_app/shared/styles/app_colors.dart';
-import 'package:chat_app/widgets/message_tile.dart';
+import 'package:chat_app/widgets/group_messages_tile.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/material.dart';
@@ -55,7 +55,7 @@ class _GroupsChatScreenState extends State<GroupsChatScreen> {
   }
 
   getChatAndAdmin() {
-    DatabaseServices().getChats(widget.groupId).then((value) {
+    DatabaseServices().getGroupsChats(widget.groupId).then((value) {
       setState(() {
         chats = value;
       });
@@ -210,7 +210,7 @@ class _GroupsChatScreenState extends State<GroupsChatScreen> {
               ? ListView.builder(
                   itemCount: snapshot.data.docs.length,
                   itemBuilder: (context, index) {
-                    return MessageTile(
+                    return GroupMessagesTile(
                       message: snapshot.data.docs[index]['message'],
                       sender: snapshot.data.docs[index]['sender'],
                       sentByMe: widget.userName ==

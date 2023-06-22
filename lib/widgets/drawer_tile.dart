@@ -1,5 +1,5 @@
 import 'package:chat_app/screens/profile/profile_screen.dart';
-import 'package:chat_app/screens/settings_tab.dart';
+import 'package:chat_app/screens/about_us.dart';
 import 'package:chat_app/shared/styles/app_colors.dart';
 import 'package:chat_app/widgets/widgets.dart';
 import 'package:flutter/material.dart';
@@ -64,7 +64,7 @@ class _DrawerTileState extends State<DrawerTile> {
         ),
         ListTile(
             onTap: () {
-              nextScreen(context, ProfileScreen());
+              nextScreen(context, const ProfileScreen());
             },
             selected: true ,
             selectedColor: AppColors.primaryColor,
@@ -75,14 +75,14 @@ class _DrawerTileState extends State<DrawerTile> {
                 style: Theme.of(context).textTheme.bodyMedium)),
         ListTile(
             onTap: () {
-              nextScreen(context, SettingsTab());
+              nextScreen(context, const AboutUs());
             },
             selected:  true,
             selectedColor: AppColors.primaryColor,
             contentPadding:
                 const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-            leading: const Icon(Icons.settings),
-            title: Text("Settings",
+            leading: const Icon(Icons.info),
+            title: Text("About us",
                 style: Theme.of(context).textTheme.bodyMedium)),
       ],
     );

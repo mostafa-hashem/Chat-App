@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import '../../helper/helper_functions.dart';
+import '../../services/auth_services.dart';
+import '../../shared/provider/app_provider.dart';
+import '../../shared/styles/app_colors.dart';
+import '../auth/login/login_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -11,7 +16,7 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-
+  AuthServices authService = AuthServices();
   String userName = '';
   String email = '';
 
@@ -36,6 +41,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    var provider = Provider.of<MyAppProvider>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -85,7 +91,61 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   style: GoogleFonts.ubuntu(fontSize: 15.sp),
                 )
               ],
-            )
+            ),
+            SizedBox(height: MediaQuery.of(context).size.height * 0.09),
+            GestureDetector(
+              onTap: () {
+                showDialog(
+                    barrierDismissible: false,
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: const Text("Logout"),
+                        content:
+                        const Text("Are you sure you want to logout?"),
+                        actions: [
+                          IconButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              icon: const Icon(
+                                Icons.cancel,
+                                color: Colors.red,
+                              )),
+                          IconButton(
+                              onPressed: () {
+                                authService.signOut().whenComplete(() {
+                                  Navigator.of(context).pushAndRemoveUntil(
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                          const LoginScreen()),
+                                          (route) => false);
+                                });
+                              },
+                              icon: const Icon(
+                                Icons.done,
+                                color: Colors.green,
+                              )),
+                        ],
+                      );
+                    });
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(22.r),
+                  color: AppColors.primaryColor,
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Center(
+                      child: provider.language == "en"
+                          ? Text("Logout",
+                          style: Theme.of(context).textTheme.bodyMedium)
+                          : Text("تسجيل خروج",
+                          style: Theme.of(context).textTheme.bodyMedium)),
+                ),
+              ),
+            ),
           ],
         ),
       ),

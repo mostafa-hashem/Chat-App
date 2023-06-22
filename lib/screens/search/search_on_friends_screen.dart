@@ -100,8 +100,8 @@ class _SearchOnFriendsScreenState extends State<SearchOnFriendsScreen> {
     await DatabaseServices()
         .searchFriendsByName(searchOnFriendsController.text)
         .then((snapshot) {
-      searchSnapshot = snapshot;
       setState(() {
+        searchSnapshot = snapshot;
         isLoading = false;
         hasUserSearched = true;
       });
@@ -116,7 +116,7 @@ class _SearchOnFriendsScreenState extends State<SearchOnFriendsScreen> {
         itemBuilder: (context, index) {
           return friendTitle(
             searchSnapshot!.docs[index]["fullName"],
-            searchSnapshot!.docs[index]["id"],
+            searchSnapshot!.docs[index]["uid"],
           );
         })
         : Center(
@@ -151,68 +151,71 @@ class _SearchOnFriendsScreenState extends State<SearchOnFriendsScreen> {
                 ))
             : null;
       },
-      child: ListTile(
-        leading: CircleAvatar(
-          radius: 30,
-          backgroundColor: AppColors.primaryColor,
-          child: Text(
-            getName(friendName).substring(0, 1).toUpperCase(),
-            style: GoogleFonts.ubuntu(
-                fontWeight: FontWeight.w500, color: Colors.white),
+      child: Padding(
+        padding: const EdgeInsets.all(8),
+        child: ListTile(
+          leading: CircleAvatar(
+            radius: 30,
+            backgroundColor: AppColors.primaryColor,
+            child: Text(
+              getName(friendName).substring(0, 1).toUpperCase(),
+              style: GoogleFonts.ubuntu(
+                  fontWeight: FontWeight.w500, color: Colors.white),
+            ),
           ),
-        ),
-        title: Text(
-          getName(friendName),
-          style: Theme.of(context).textTheme.bodyMedium,
-        ),
-        trailing: InkWell(
-          onTap: () async {
-            await DatabaseServices(uid: user!.uid)
-                .toggleFriendOrNot(friendId, friendName);
-            if (isFriend) {
-              setState(() {
-                isFriend = !isFriend;
-              });
-              showSnackBar(
-                  context, Colors.green, "Successfully added");
-              Future.delayed(const Duration(seconds: 2), () {
-                nextScreen(
-                    context,
-                    FriendsChatScreen(
-                      friendName: friendName,
-                      friendId: friendId,
-                      bio: "",
-                    ));
-              });
-            } else {
-              setState(() {
-                isFriend = !isFriend;
-                showSnackBar(context, Colors.red, "Unfriend $friendName");
-              });
-            }
-          },
-          child: isFriend
-              ? Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: Colors.black,
-                    border: Border.all(color: Colors.white, width: 1),
+          title: Text(
+            getName(friendName),
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+          trailing: InkWell(
+            onTap: () async {
+              await DatabaseServices(uid: user!.uid)
+                  .toggleFriendOrNot(friendId, friendName);
+              if (isFriend) {
+                setState(() {
+                  isFriend = !isFriend;
+                });
+                showSnackBar(
+                    context, Colors.green, "Successfully added");
+                Future.delayed(const Duration(seconds: 2), () {
+                  nextScreen(
+                      context,
+                      FriendsChatScreen(
+                        friendName: friendName,
+                        friendId: friendId,
+                        bio: ""
+                      ));
+                });
+              } else {
+                setState(() {
+                  isFriend = !isFriend;
+                  showSnackBar(context, Colors.red, "Unfriend $friendName");
+                });
+              }
+            },
+            child: isFriend
+                ? Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.black,
+                      border: Border.all(color: Colors.white, width: 1),
+                    ),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    child: Text("Already friend",
+                        style: GoogleFonts.ubuntu(color: Colors.white)),
+                  )
+                : Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: AppColors.primaryColor,
+                    ),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    child: Text("Add friend",
+                        style: GoogleFonts.ubuntu(color: Colors.white)),
                   ),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  child: Text("Already friend",
-                      style: GoogleFonts.ubuntu(color: Colors.white)),
-                )
-              : Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: AppColors.primaryColor,
-                  ),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  child: Text("Add friend",
-                      style: GoogleFonts.ubuntu(color: Colors.white)),
-                ),
+          ),
         ),
       ),
     );

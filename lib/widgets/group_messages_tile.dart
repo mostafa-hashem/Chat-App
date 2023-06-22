@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 
-class MessageTile extends StatefulWidget {
+class GroupMessagesTile extends StatefulWidget {
   final String message;
   final String sender;
   final bool sentByMe;
@@ -11,7 +11,7 @@ class MessageTile extends StatefulWidget {
   final String groupId;
   final String messageId;
 
-  const MessageTile({
+  const GroupMessagesTile({
     Key? key,
     required this.message,
     required this.sender,
@@ -22,10 +22,10 @@ class MessageTile extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<MessageTile> createState() => _MessageTileState();
+  State<GroupMessagesTile> createState() => _GroupMessagesTileState();
 }
 
-class _MessageTileState extends State<MessageTile> {
+class _GroupMessagesTileState extends State<GroupMessagesTile> {
   String getFormattedTime() {
     final dateTime = DateTime.fromMillisecondsSinceEpoch(widget.timeOfMessage);
     final formatter = DateFormat.jm();

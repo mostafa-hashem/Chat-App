@@ -1,14 +1,17 @@
 import 'package:chat_app/services/database_services.dart';
 import 'package:chat_app/shared/provider/app_provider.dart';
 import 'package:chat_app/shared/styles/app_colors.dart';
-import 'package:chat_app/widgets/message_tile.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/foundation.dart' as foundation;
+
+import '../../helper/helper_functions.dart';
+import '../../widgets/friend_messages_tile.dart';
 
 class FriendsChatScreen extends StatefulWidget {
   const FriendsChatScreen({
@@ -29,9 +32,8 @@ class FriendsChatScreen extends StatefulWidget {
 class _FriendsChatScreenState extends State<FriendsChatScreen> {
   TextEditingController messageController = TextEditingController();
   Stream<QuerySnapshot>? chats;
-
-
   bool emojiShowing = false;
+  String userName = "";
 
   @override
   void dispose() {
@@ -48,12 +50,21 @@ class _FriendsChatScreenState extends State<FriendsChatScreen> {
 
   @override
   void initState() {
-    getChatAndAdmin();
+    getChatData();
+    getSenderName();
     super.initState();
   }
 
-  getChatAndAdmin() {
-    DatabaseServices().getChats(widget.friendId).then((value) {
+  getSenderName()async {
+    await HelperFunctions.getUserNameFromSp().then((value) {
+      setState(() {
+        userName = value!;
+      });
+    });
+  }
+
+  getChatData() {
+    DatabaseServices().getFriendsChats(widget.friendId).then((value) {
       setState(() {
         chats = value;
       });
@@ -131,7 +142,7 @@ class _FriendsChatScreenState extends State<FriendsChatScreen> {
                     color: Colors.transparent,
                     child: IconButton(
                         onPressed: () {
-                          // sendMessageToGroup();
+                          sendMessageToFriend();
                         },
                         icon: const Icon(
                           Icons.send,
@@ -197,14 +208,14 @@ class _FriendsChatScreenState extends State<FriendsChatScreen> {
               ? ListView.builder(
                   itemCount: snapshot.data.docs.length,
                   itemBuilder: (context, index) {
-                    return MessageTile(
+                    return FriendMessagesTile(
                       message: snapshot.data.docs[index]['message'],
                       sender: snapshot.data.docs[index]['sender'],
                       sentByMe: widget.friendName ==
                           snapshot.data.docs[index]['sender'],
                       timeOfMessage: snapshot.data.docs[index]['time'],
-                      groupId: widget.friendId,
-                      messageId: snapshot.data.docs[index].id,
+                      friendId: widget.friendId,
+                      messageId: snapshot.data.docs[index].id, userId: FirebaseAuth.instance.currentUser!.uid,
                     );
                   },
                 )
@@ -214,14 +225,16 @@ class _FriendsChatScreenState extends State<FriendsChatScreen> {
     );
   }
 
-  void sendMessageToGroup() {
+  void sendMessageToFriend() {
     if (messageController.text.isNotEmpty) {
       Map<String, dynamic> chatMessageData = {
         "message": messageController.text,
-        "sender": widget.friendName,
+        "sender": userName,
         "time": DateTime.now().millisecondsSinceEpoch,
       };
-      DatabaseServices().sendMessageToGroup(widget.friendId, chatMessageData);
+      DatabaseServices(uid: FirebaseAuth.instance.currentUser!.uid)
+          .sendMessageToFriend(FirebaseAuth.instance.currentUser!.uid,
+              widget.friendId, chatMessageData);
       setState(() {
         messageController.clear();
       });

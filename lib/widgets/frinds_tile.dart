@@ -1,3 +1,4 @@
+import 'package:chat_app/helper/helper_functions.dart';
 import 'package:chat_app/screens/chats/frinds_chat_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -21,6 +22,21 @@ class FriendTile extends StatefulWidget {
 }
 
 class _FriendTileState extends State<FriendTile> {
+  String userName = "";
+
+  @override
+  void initState() {
+    super.initState();
+    getSenderName();
+  }
+
+getSenderName()async {
+  await HelperFunctions.getUserNameFromSp().then((value) {
+    setState(() {
+      userName = value!;
+    });
+  });
+}
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -30,7 +46,7 @@ class _FriendTileState extends State<FriendTile> {
             FriendsChatScreen(
               friendName: widget.friendName,
               friendId: widget.friendId,
-              bio: widget.bio,
+              bio: widget.bio
             ));
       },
       child: Container(

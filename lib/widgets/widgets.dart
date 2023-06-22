@@ -1,4 +1,8 @@
+import 'package:chat_app/widgets/theme_bottom_sheet.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import 'language_bootom_sheet.dart';
 
 var textInoutDecoration = const InputDecoration(
   focusedBorder: OutlineInputBorder(
@@ -40,5 +44,29 @@ String getId(String res) {
 
 String getName(String res) {
   return res.substring(res.indexOf("_") + 1);
+}
+
+void showLanguageSheet(context) {
+  showModalBottomSheet(
+    context: context,
+    builder: (context) {
+      return LanguageBottomSheet();
+    },
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(16.r),
+    ),
+  );
+}
+
+void showThemeSheet(context) {
+  showModalBottomSheet(
+    context: context,
+    builder: (context) {
+      return ThemeBottomSheet();
+    },
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(16.0.r),
+    ),
+  );
 }
 
