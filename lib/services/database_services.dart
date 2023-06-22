@@ -35,7 +35,7 @@ class DatabaseServices {
   }
 
   //get user groups
-  getUserGroups() async {
+  getUserCollection() async {
     return userCollection.doc(uid).snapshots();
   }
 

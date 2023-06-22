@@ -1,5 +1,6 @@
 import 'package:chat_app/screens/chats/frinds_chat_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -23,6 +24,8 @@ class _SearchOnFriendsScreenState extends State<SearchOnFriendsScreen> {
   bool isFriend = false;
   String? friendId;
   String? friendName;
+  String? bio;
+  User? user;
 
   @override
   Widget build(BuildContext context) {
@@ -93,31 +96,68 @@ class _SearchOnFriendsScreenState extends State<SearchOnFriendsScreen> {
                           child: ListView.builder(
                             itemCount: searchSnapshot!.docs.length,
                             itemBuilder: (BuildContext context, int index) {
-                              return InkWell(
-                                onTap: (){
-                                  isFriend == false ?
-                                  nextScreen(
-                                      context,
-                                      FriendsChatScreen(
-                                          friendId: friendId??"", friendName: friendName??""))
-                                      : null;
-                                },
-                                child: ListTile(
-                                  leading: CircleAvatar(
-                                    radius: 30,
-                                    backgroundColor: AppColors.primaryColor,
-                                    child: Text(
-                                      searchSnapshot!.docs[index]["fullName"]
-                                          .substring(0, 1)
-                                          .toUpperCase(),
-                                      style: GoogleFonts.ubuntu(
-                                          fontWeight: FontWeight.w500,
-                                          color: Colors.white),
-                                    ),
+                              return ListTile(
+                                leading: CircleAvatar(
+                                  radius: 30,
+                                  backgroundColor: AppColors.primaryColor,
+                                  child: Text(
+                                    searchSnapshot!.docs[index]["fullName"]
+                                        .substring(0, 1)
+                                        .toUpperCase(),
+                                    style: GoogleFonts.ubuntu(
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.white),
                                   ),
-                                  title: Text(
-                                    searchSnapshot!.docs[index]["fullName"],
-                                    style: Theme.of(context).textTheme.bodyMedium,
+                                ),
+                                title: Text(
+                                  searchSnapshot!.docs[index]["fullName"],
+                                  style: Theme.of(context).textTheme.bodyMedium,
+                                ),
+                                trailing: InkWell(
+                                  onTap: () async {
+                                    await DatabaseServices(uid: user!.uid)
+                                        .toggleFriendOrNot(friendId!, friendName!, );
+                                    if (isFriend) {
+                                      setState(() {
+                                        isFriend = !isFriend;
+                                      });
+                                      showSnackBar(
+                                          context, Colors.green, "Successfully Added friend");
+                                      Future.delayed(const Duration(seconds: 2), () {
+                                        nextScreen(
+                                            context,
+                                            FriendsChatScreen(
+                                                friendName: friendName ??"",
+                                                bio: bio??"", friendId: friendId??"",));
+                                      });
+                                    } else {
+                                      setState(() {
+                                        isFriend = !isFriend;
+                                        showSnackBar(context, Colors.red, "Unfriend $widget");
+                                      });
+                                    }
+                                  },
+                                  child: isFriend
+                                      ? Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      color: Colors.black,
+                                      border: Border.all(color: Colors.white, width: 1),
+                                    ),
+                                    padding:
+                                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                                    child: Text("Friend",
+                                        style: GoogleFonts.ubuntu(color: Colors.white)),
+                                  )
+                                      : Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      color: AppColors.primaryColor,
+                                    ),
+                                    padding:
+                                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                                    child: Text("Add Friend",
+                                        style: GoogleFonts.ubuntu(color: Colors.white)),
                                   ),
                                 ),
                               );
@@ -149,6 +189,17 @@ class _SearchOnFriendsScreenState extends State<SearchOnFriendsScreen> {
       setState(() {
         isLoading = false;
         hasUserSearched = true;
+      });
+    });
+  }
+
+  friendOrNot(String friendName, String friendId,
+      String adminName) async {
+    await DatabaseServices(uid: user!.uid)
+        .isUserFriend(friendName, friendId)
+        .then((value) {
+      setState(() {
+        isFriend = value;
       });
     });
   }

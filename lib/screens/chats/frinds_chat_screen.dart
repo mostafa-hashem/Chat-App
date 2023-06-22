@@ -15,10 +15,12 @@ class FriendsChatScreen extends StatefulWidget {
     Key? key,
     required this.friendId,
     required this.friendName,
+    required this.bio,
   }) : super(key: key);
 
   final String friendName;
   final String friendId;
+  final String bio;
 
   @override
   State<FriendsChatScreen> createState() => _FriendsChatScreenState();
@@ -27,7 +29,7 @@ class FriendsChatScreen extends StatefulWidget {
 class _FriendsChatScreenState extends State<FriendsChatScreen> {
   TextEditingController messageController = TextEditingController();
   Stream<QuerySnapshot>? chats;
-  String adminName = "";
+
 
   bool emojiShowing = false;
 
@@ -56,11 +58,6 @@ class _FriendsChatScreenState extends State<FriendsChatScreen> {
         chats = value;
       });
     });
-    DatabaseServices().getGroupAdmin(widget.friendId).then((value) {
-      setState(() {
-        adminName = value;
-      });
-    });
   }
 
   @override
@@ -74,10 +71,7 @@ class _FriendsChatScreenState extends State<FriendsChatScreen> {
         ),
         actions: [
           IconButton(
-            onPressed: () {
-
-
-            },
+            onPressed: () {},
             icon: const Icon(Icons.info),
           ),
         ],
@@ -113,17 +107,19 @@ class _FriendsChatScreenState extends State<FriendsChatScreen> {
                       child: TextField(
                           controller: messageController,
                           style: TextStyle(
-                              fontSize: 14.sp, color: provider.themeMode == ThemeMode.light ? Colors.black87 : AppColors.lightColor),
+                              fontSize: 14.sp,
+                              color: provider.themeMode == ThemeMode.light
+                                  ? Colors.black87
+                                  : AppColors.lightColor),
                           decoration: InputDecoration(
                             hintText: 'Type a message',
                             hintStyle: Theme.of(context).textTheme.bodySmall,
                             filled: true,
-                            fillColor: provider.themeMode == ThemeMode.light ?  Colors.white : AppColors.darkColor,
+                            fillColor: provider.themeMode == ThemeMode.light
+                                ? Colors.white
+                                : AppColors.darkColor,
                             contentPadding: const EdgeInsets.only(
-                                left: 16.0,
-                                bottom: 8.0,
-                                top: 8.0,
-                                right: 16.0),
+                                left: 16.0, bottom: 8.0, top: 8.0, right: 16.0),
                             border: OutlineInputBorder(
                               borderSide: BorderSide.none,
                               borderRadius: BorderRadius.circular(50.r),
@@ -154,15 +150,16 @@ class _FriendsChatScreenState extends State<FriendsChatScreen> {
                   config: Config(
                     columns: 7,
                     emojiSizeMax: 30 *
-                        (foundation.defaultTargetPlatform ==
-                            TargetPlatform.iOS
+                        (foundation.defaultTargetPlatform == TargetPlatform.iOS
                             ? 1.30
                             : 1.0),
                     verticalSpacing: 0,
                     horizontalSpacing: 0,
                     gridPadding: EdgeInsets.zero,
                     initCategory: Category.RECENT,
-                    bgColor: provider.themeMode == ThemeMode.light ? const Color(0xFFF2F2F2) : AppColors.darkColor,
+                    bgColor: provider.themeMode == ThemeMode.light
+                        ? const Color(0xFFF2F2F2)
+                        : AppColors.darkColor,
                     indicatorColor: AppColors.primaryColor,
                     iconColor: Colors.grey,
                     iconColorSelected: AppColors.primaryColor,
@@ -198,19 +195,19 @@ class _FriendsChatScreenState extends State<FriendsChatScreen> {
         builder: (context, AsyncSnapshot snapshot) {
           return snapshot.hasData
               ? ListView.builder(
-            itemCount: snapshot.data.docs.length,
-            itemBuilder: (context, index) {
-              return MessageTile(
-                message: snapshot.data.docs[index]['message'],
-                sender: snapshot.data.docs[index]['sender'],
-                sentByMe: widget.friendName ==
-                    snapshot.data.docs[index]['sender'],
-                timeOfMessage: snapshot.data.docs[index]['time'],
-                groupId: widget.friendId,
-                messageId: snapshot.data.docs[index].id,
-              );
-            },
-          )
+                  itemCount: snapshot.data.docs.length,
+                  itemBuilder: (context, index) {
+                    return MessageTile(
+                      message: snapshot.data.docs[index]['message'],
+                      sender: snapshot.data.docs[index]['sender'],
+                      sentByMe: widget.friendName ==
+                          snapshot.data.docs[index]['sender'],
+                      timeOfMessage: snapshot.data.docs[index]['time'],
+                      groupId: widget.friendId,
+                      messageId: snapshot.data.docs[index].id,
+                    );
+                  },
+                )
               : Container();
         },
       ),

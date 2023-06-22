@@ -1,36 +1,59 @@
+import 'package:chat_app/screens/chats/frinds_chat_screen.dart';
 import 'package:flutter/material.dart';
-
+import 'package:google_fonts/google_fonts.dart';
 import '../shared/styles/app_colors.dart';
+import 'widgets.dart';
 
-class FriendsTile extends StatelessWidget {
-  final String userName;
-  final String userEmail;
+class FriendTile extends StatefulWidget {
+  const FriendTile(
+      {Key? key,
+      required this.friendId,
+      required this.friendName,
+      required this.bio})
+      : super(key: key);
 
-  const FriendsTile({super.key, required this.userName, required this.userEmail});
+  final String friendName;
+  final String friendId;
+  final String bio;
 
   @override
+  State<FriendTile> createState() => _FriendTileState();
+}
+
+class _FriendTileState extends State<FriendTile> {
+  @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(userName),
-            Text(userEmail),
-          ],
-        ),
-        const Spacer(),
-        GestureDetector(
-          onTap: () {
-            // Add friend functionality
-            // You can add the required functionality here
-          },
-          child: const Icon(
-            Icons.person_add,
-            color: AppColors.primaryColor,
+    return GestureDetector(
+      onTap: () {
+        nextScreen(
+            context,
+            FriendsChatScreen(
+              friendName: widget.friendName,
+              friendId: widget.friendId,
+              bio: widget.bio,
+            ));
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+        child: ListTile(
+          leading: CircleAvatar(
+            radius: 30,
+            backgroundColor: AppColors.primaryColor,
+            child: Text(widget.friendName.substring(0, 1).toUpperCase(),
+                textAlign: TextAlign.center,
+                style: GoogleFonts.ubuntu(
+                    fontWeight: FontWeight.w500, color: Colors.white)),
+          ),
+          title: Text(
+            widget.friendId,
+            style: GoogleFonts.novaSquare(fontWeight: FontWeight.bold),
+          ),
+          subtitle: Text(
+            widget.bio,
+            style: GoogleFonts.ubuntu(fontSize: 13),
           ),
         ),
-      ],
+      ),
     );
   }
 }

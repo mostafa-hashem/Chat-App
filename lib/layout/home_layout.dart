@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../helper/helper_functions.dart';
-import '../screens/chats/chats_screen.dart';
+import '../screens/chats/friends_screen.dart';
 import '../screens/groups/groups_screen.dart';
 import '../screens/search/search_on_grops_screen.dart';
 import '../services/auth_services.dart';
@@ -107,7 +107,7 @@ class _HomeLayoutState extends State<HomeLayout> with TickerProviderStateMixin {
           TabBarView(
             controller: _tabController,
             children: const <Widget>[
-              ChatsScreen(),
+              FriendsScreen(),
               GroupsScreen(),
             ],
           ),
