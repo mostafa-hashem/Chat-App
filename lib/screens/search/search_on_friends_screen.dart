@@ -168,7 +168,7 @@ class _SearchOnFriendsScreenState extends State<SearchOnFriendsScreen> {
         trailing: InkWell(
           onTap: () async {
             await DatabaseServices(uid: user!.uid)
-                .toggleFriendOrNot(friendId, friendName,isFriend);
+                .toggleFriendOrNot(friendId, friendName);
             if (isFriend) {
               setState(() {
                 isFriend = !isFriend;
