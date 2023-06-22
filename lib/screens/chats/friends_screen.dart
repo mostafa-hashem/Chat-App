@@ -1,3 +1,4 @@
+import 'package:chat_app/screens/search/search_on_friends_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -50,10 +51,11 @@ class _FriendsScreenState extends State<FriendsScreen> {
                     int reverseIndex =
                         snapshot.data['friends'].length - index - 1;
                     return FriendTile(
-                        friendId: getId(snapshot.data['friends'][reverseIndex]),
-                        friendName:
-                        getName(snapshot.data['friends'][reverseIndex]),
-                       bio: '',);
+                      friendId: getId(snapshot.data['friends'][reverseIndex]),
+                      friendName:
+                          getName(snapshot.data['friends'][reverseIndex]),
+                      bio: '',
+                    );
                   },
                 );
               } else {
@@ -65,20 +67,33 @@ class _FriendsScreenState extends State<FriendsScreen> {
           } else {
             return const Center(
                 child:
-                CircularProgressIndicator(color: AppColors.primaryColor));
+                    CircularProgressIndicator(color: AppColors.primaryColor));
           }
         });
   }
 
   noFriendsWidget() {
-    return Padding(
-      padding: const EdgeInsets.all(22),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 25),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          GestureDetector(
+            onTap: () {
+              nextScreen(context, const SearchOnFriendsScreen());
+            },
+            child: Icon(
+              Icons.add_circle,
+              color: Colors.grey[700],
+              size: 75,
+            ),
+          ),
+          const SizedBox(
+            height: 20,
+          ),
           Text(
-            "You've not joined any groups, tap on the add icon to create a group or also search from top search button.",
+            "You've no friends till now, tap on the add icon to add friend or also search from top search button.",
             textAlign: TextAlign.center,
             style: GoogleFonts.ubuntu(),
           )
@@ -86,5 +101,4 @@ class _FriendsScreenState extends State<FriendsScreen> {
       ),
     );
   }
-
 }

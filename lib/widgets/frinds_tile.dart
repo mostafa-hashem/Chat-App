@@ -45,7 +45,7 @@ class _FriendTileState extends State<FriendTile> {
                     fontWeight: FontWeight.w500, color: Colors.white)),
           ),
           title: Text(
-            widget.friendId,
+            widget.friendName,
             style: GoogleFonts.novaSquare(fontWeight: FontWeight.bold),
           ),
           subtitle: Text(

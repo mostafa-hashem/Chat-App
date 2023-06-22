@@ -38,10 +38,9 @@ class _SearchOnFriendsScreenState extends State<SearchOnFriendsScreen> {
         title: Text(
           "Search",
           style: GoogleFonts.ubuntu(
-            fontSize: 18.sp,
-            fontWeight: FontWeight.w400,
-            color: Colors.white,
-          ),
+              fontSize: 18.sp,
+              fontWeight: FontWeight.w400,
+              color: Colors.white),
         ),
       ),
       body: Column(
@@ -56,13 +55,10 @@ class _SearchOnFriendsScreenState extends State<SearchOnFriendsScreen> {
                     controller: searchOnFriendsController,
                     style: GoogleFonts.ubuntu(color: Colors.white),
                     decoration: InputDecoration(
-                      border: InputBorder.none,
-                      hintText: "Search On Friend....",
-                      hintStyle: GoogleFonts.novaFlat(
-                        color: Colors.white,
-                        fontSize: 16,
-                      ),
-                    ),
+                        border: InputBorder.none,
+                        hintText: "Search friends....",
+                        hintStyle: GoogleFonts.novaFlat(
+                            color: Colors.white, fontSize: 16)),
                   ),
                 ),
                 GestureDetector(
@@ -73,104 +69,23 @@ class _SearchOnFriendsScreenState extends State<SearchOnFriendsScreen> {
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(40),
-                    ),
+                        color: Colors.white.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(40)),
                     child: const Icon(
                       Icons.search,
                       color: Colors.white,
                     ),
                   ),
-                ),
+                )
               ],
             ),
           ),
           isLoading
               ? const Center(
-                  child:
-                      CircularProgressIndicator(color: AppColors.primaryColor),
-                )
-              : hasUserSearched
-                  ? searchSnapshot != null
-                      ? Expanded(
-                          child: ListView.builder(
-                            itemCount: searchSnapshot!.docs.length,
-                            itemBuilder: (BuildContext context, int index) {
-                              return ListTile(
-                                leading: CircleAvatar(
-                                  radius: 30,
-                                  backgroundColor: AppColors.primaryColor,
-                                  child: Text(
-                                    searchSnapshot!.docs[index]["fullName"]
-                                        .substring(0, 1)
-                                        .toUpperCase(),
-                                    style: GoogleFonts.ubuntu(
-                                        fontWeight: FontWeight.w500,
-                                        color: Colors.white),
-                                  ),
-                                ),
-                                title: Text(
-                                  searchSnapshot!.docs[index]["fullName"],
-                                  style: Theme.of(context).textTheme.bodyMedium,
-                                ),
-                                trailing: InkWell(
-                                  onTap: () async {
-                                    await DatabaseServices(uid: user!.uid)
-                                        .toggleFriendOrNot(friendId!, friendName!, );
-                                    if (isFriend) {
-                                      setState(() {
-                                        isFriend = !isFriend;
-                                      });
-                                      showSnackBar(
-                                          context, Colors.green, "Successfully Added friend");
-                                      Future.delayed(const Duration(seconds: 2), () {
-                                        nextScreen(
-                                            context,
-                                            FriendsChatScreen(
-                                                friendName: friendName ??"",
-                                                bio: bio??"", friendId: friendId??"",));
-                                      });
-                                    } else {
-                                      setState(() {
-                                        isFriend = !isFriend;
-                                        showSnackBar(context, Colors.red, "Unfriend $widget");
-                                      });
-                                    }
-                                  },
-                                  child: isFriend
-                                      ? Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      color: Colors.black,
-                                      border: Border.all(color: Colors.white, width: 1),
-                                    ),
-                                    padding:
-                                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                                    child: Text("Friend",
-                                        style: GoogleFonts.ubuntu(color: Colors.white)),
-                                  )
-                                      : Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      color: AppColors.primaryColor,
-                                    ),
-                                    padding:
-                                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                                    child: Text("Add Friend",
-                                        style: GoogleFonts.ubuntu(color: Colors.white)),
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                        )
-                      : Center(
-                          child: Text(
-                            "No results found.",
-                            style: Theme.of(context).textTheme.bodyMedium,
-                          ),
-                        )
-                  : Container(),
+            child:
+            CircularProgressIndicator(color: AppColors.primaryColor),
+          )
+              : friendList(),
         ],
       ),
     );
@@ -193,8 +108,25 @@ class _SearchOnFriendsScreenState extends State<SearchOnFriendsScreen> {
     });
   }
 
-  friendOrNot(String friendName, String friendId,
-      String adminName) async {
+  friendList() {
+    return hasUserSearched
+        ? ListView.builder(
+        shrinkWrap: true,
+        itemCount: searchSnapshot!.docs.length,
+        itemBuilder: (context, index) {
+          return friendTitle(
+            searchSnapshot!.docs[index]["fullName"],
+            searchSnapshot!.docs[index]["id"],
+          );
+        })
+        : Center(
+        child: Text(
+          "No results found.",
+          style: Theme.of(context).textTheme.bodyMedium,
+        ));
+  }
+
+  friendOrNot( String friendName,  String friendId,) async {
     await DatabaseServices(uid: user!.uid)
         .isUserFriend(friendName, friendId)
         .then((value) {
@@ -202,5 +134,87 @@ class _SearchOnFriendsScreenState extends State<SearchOnFriendsScreen> {
         isFriend = value;
       });
     });
+  }
+
+  Widget friendTitle(String friendName, String friendId) {
+    //check whether user already exists in group
+    friendOrNot(friendName, friendId);
+    return InkWell(
+      onTap: () {
+        isFriend
+            ? nextScreen(
+                context,
+                FriendsChatScreen(
+                  friendId: friendId,
+                  friendName: friendName,
+                  bio: '',
+                ))
+            : null;
+      },
+      child: ListTile(
+        leading: CircleAvatar(
+          radius: 30,
+          backgroundColor: AppColors.primaryColor,
+          child: Text(
+            getName(friendName).substring(0, 1).toUpperCase(),
+            style: GoogleFonts.ubuntu(
+                fontWeight: FontWeight.w500, color: Colors.white),
+          ),
+        ),
+        title: Text(
+          getName(friendName),
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
+        trailing: InkWell(
+          onTap: () async {
+            await DatabaseServices(uid: user!.uid)
+                .toggleFriendOrNot(friendId, friendName,isFriend);
+            if (isFriend) {
+              setState(() {
+                isFriend = !isFriend;
+              });
+              showSnackBar(
+                  context, Colors.green, "Successfully added");
+              Future.delayed(const Duration(seconds: 2), () {
+                nextScreen(
+                    context,
+                    FriendsChatScreen(
+                      friendName: friendName,
+                      friendId: friendId,
+                      bio: "",
+                    ));
+              });
+            } else {
+              setState(() {
+                isFriend = !isFriend;
+                showSnackBar(context, Colors.red, "Unfriend $friendName");
+              });
+            }
+          },
+          child: isFriend
+              ? Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: Colors.black,
+                    border: Border.all(color: Colors.white, width: 1),
+                  ),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  child: Text("Already friend",
+                      style: GoogleFonts.ubuntu(color: Colors.white)),
+                )
+              : Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: AppColors.primaryColor,
+                  ),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  child: Text("Add friend",
+                      style: GoogleFonts.ubuntu(color: Colors.white)),
+                ),
+        ),
+      ),
+    );
   }
 }

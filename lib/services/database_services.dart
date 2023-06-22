@@ -21,6 +21,7 @@ class DatabaseServices {
       "friends": [],
       "profilePic": "",
       "uid": uid,
+      "bio": "",
     });
   }
 
@@ -66,24 +67,25 @@ class DatabaseServices {
 
 
   //add friend
-  Future addFriend(String friendName, String friendId) async {
-    DocumentReference friendDocumentReference = await friendCollection.add({
+  Future<void> addFriend(String friendName, String friendId) async {
+    DocumentReference<Object?> friendDocumentReference =
+    await friendCollection.add({
       "friendIcon": "",
       "friendName": "${friendId}_$friendName",
+      "friendBio": "",
       "friendId": "",
       "recentMessage": "",
       "recentMessageSender": "",
     });
 
-    //update the members
     await friendDocumentReference.update({
       "friendId": friendDocumentReference.id,
     });
 
-    DocumentReference userDocumentReference = userCollection.doc(uid);
-    return await userDocumentReference.update({
-      "friends":
-      FieldValue.arrayUnion(["${friendDocumentReference.id}_$friendName"]),
+    DocumentReference<Object?> userDocumentReference =
+    userCollection.doc(uid);
+    await userDocumentReference.update({
+      "friends": FieldValue.arrayUnion(["${friendDocumentReference.id}_$friendName"]),
     });
   }
 
@@ -129,16 +131,11 @@ class DatabaseServices {
     }
   }
 
-  Future<bool> isUserFriend(
-      String friendName, String friendId) async {
-    DocumentReference userDocumentReference = userCollection.doc(uid);
-    DocumentSnapshot documentSnapshot = await userDocumentReference.get();
-    List<dynamic> groups = await documentSnapshot['friends'];
-    if (groups.contains("${friendId}_$friendName")) {
-      return true;
-    } else {
-      return false;
-    }
+  Future<bool> isUserFriend(String friendId, String friendName) async {
+    DocumentSnapshot<Object?> documentSnapshot =
+    await userCollection.doc(uid).get();
+    List<dynamic> friends = documentSnapshot['friends'];
+    return friends.contains("${friendId}_$friendName");
   }
 
 // toggling the group join/exit
@@ -171,20 +168,17 @@ class DatabaseServices {
   }
 
 // toggling the friend or not
-  Future toggleFriendOrNot(
-      String friendId, String friendName) async {
-    DocumentReference userDocumentReference = userCollection.doc(uid);
-    DocumentSnapshot documentSnapshot = await userDocumentReference.get();
-    List<dynamic> friends = await documentSnapshot['friends'];
+  Future<void> toggleFriendOrNot(String friendId, String friendName, bool isFriend) async {
+    DocumentReference<Object?> userDocumentReference =
+    userCollection.doc(uid);
 
-    // if user has our groups -> then remove then or also in other part re join
-    if (friends.contains("${friendId}_$friendName")) {
+    if (isFriend) {
       await userDocumentReference.update({
         "friends": FieldValue.arrayRemove(["${friendId}_$friendName"]),
       });
     } else {
       await userDocumentReference.update({
-        "friends": FieldValue.arrayUnion(["${friendId}_$friendName"])
+        "friends": FieldValue.arrayUnion(["${friendId}_$friendName"]),
       });
     }
   }
@@ -229,4 +223,36 @@ class DatabaseServices {
    DocumentReference groupDocumentReference = groupCollection.doc(groupId);
    await groupDocumentReference.collection("members").doc(uid).delete();
  }
+
+
+
+  Future<void> updateGroupName(String groupId, String groupName) async {
+    DocumentReference<Object?> groupDocumentReference =
+    groupCollection.doc(groupId);
+    await groupDocumentReference.update({"groupName": groupName});
+
+    DocumentReference<Object?> userDocumentReference =
+    userCollection.doc(uid);
+    await userDocumentReference.update({
+      "groups": FieldValue.arrayRemove([groupId]),
+    });
+    await userDocumentReference.update({
+      "groups": FieldValue.arrayUnion(["${groupId}_$groupName"]),
+    });
+  }
+
+  Future<void> updateFriendName(String friendId, String friendName) async {
+    DocumentReference<Object?> friendDocumentReference =
+    friendCollection.doc(friendId);
+    await friendDocumentReference.update({"friendName": friendName});
+
+    DocumentReference<Object?> userDocumentReference =
+    userCollection.doc(uid);
+    await userDocumentReference.update({
+      "friends": FieldValue.arrayRemove(["${friendId}_$friendName"]),
+    });
+    await userDocumentReference.update({
+      "friends": FieldValue.arrayUnion(["${friendId}_$friendName"]),
+    });
+  }
 }
