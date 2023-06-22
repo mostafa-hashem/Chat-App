@@ -9,7 +9,7 @@ import '../../shared/styles/app_colors.dart';
 import '../../widgets/widgets.dart';
 
 class SearchOnFriendsScreen extends StatefulWidget {
-  const SearchOnFriendsScreen({Key? key});
+  const SearchOnFriendsScreen({super.key});
 
   @override
   State<SearchOnFriendsScreen> createState() => _SearchOnFriendsScreenState();

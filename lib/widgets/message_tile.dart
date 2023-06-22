@@ -55,7 +55,7 @@ class _MessageTileState extends State<MessageTile> {
                       TextButton(
                         child: const Text('Delete for everyone'),
                         onPressed: () {
-                          DatabaseServices().deleteMessageForAll(
+                          DatabaseServices().deleteMessageForAllGroups(
                               widget.groupId, widget.messageId);
                           Navigator.pop(context);
                         },

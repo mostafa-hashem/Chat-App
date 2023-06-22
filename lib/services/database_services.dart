@@ -10,12 +10,15 @@ class DatabaseServices {
 
   final CollectionReference groupCollection =
       FirebaseFirestore.instance.collection("groups");
+  final CollectionReference friendCollection =
+      FirebaseFirestore.instance.collection("friends");
 
   Future savingUserData(String fullName, String email) async {
     return await userCollection.doc(uid) .set({
       "fullName": fullName,
       "email": email,
       "groups": [],
+      "friends": [],
       "profilePic": "",
       "uid": uid,
     });
@@ -58,6 +61,29 @@ class DatabaseServices {
     return await userDocumentReference.update({
       "groups":
           FieldValue.arrayUnion(["${groupDocumentReference.id}_$groupName"]),
+    });
+  }
+
+
+  //add friend
+  Future addFriend(String friendName, String friendId) async {
+    DocumentReference friendDocumentReference = await friendCollection.add({
+      "friendIcon": "",
+      "friendName": "${friendId}_$friendName",
+      "friendId": "",
+      "recentMessage": "",
+      "recentMessageSender": "",
+    });
+
+    //update the members
+    await friendDocumentReference.update({
+      "friendId": friendDocumentReference.id,
+    });
+
+    DocumentReference userDocumentReference = userCollection.doc(uid);
+    return await userDocumentReference.update({
+      "friends":
+      FieldValue.arrayUnion(["${friendDocumentReference.id}_$friendName"]),
     });
   }
 
@@ -146,19 +172,19 @@ class DatabaseServices {
 
 // toggling the friend or not
   Future toggleFriendOrNot(
-      String userId, String friendName) async {
+      String friendId, String friendName) async {
     DocumentReference userDocumentReference = userCollection.doc(uid);
     DocumentSnapshot documentSnapshot = await userDocumentReference.get();
     List<dynamic> friends = await documentSnapshot['friends'];
 
     // if user has our groups -> then remove then or also in other part re join
-    if (friends.contains("${userId}_$friendName")) {
+    if (friends.contains("${friendId}_$friendName")) {
       await userDocumentReference.update({
-        "friends": FieldValue.arrayRemove(["${uid}_$friendName"]),
+        "friends": FieldValue.arrayRemove(["${friendId}_$friendName"]),
       });
     } else {
       await userDocumentReference.update({
-        "friends": FieldValue.arrayUnion(["${uid}_$friendName"])
+        "friends": FieldValue.arrayUnion(["${friendId}_$friendName"])
       });
     }
   }
@@ -175,7 +201,7 @@ class DatabaseServices {
 
   sendMessageToFriend(String userId, Map<String, dynamic> chatMessageData) async {
     userCollection.doc(userId).collection("messages").add(chatMessageData);
-    groupCollection.doc(userId).update({
+    friendCollection.doc(userId).update({
       "recentMessage": chatMessageData['message'],
       "recentMessageSender": chatMessageData['sender'],
       "recentMessageTime": chatMessageData['time'].toString(),
@@ -183,9 +209,16 @@ class DatabaseServices {
   }
 
   // delete message
-  Future deleteMessageForAll(String groupId, String messageId) async {
+  Future deleteMessageForAllGroups(String groupId, String messageId) async {
     await groupCollection
         .doc(groupId)
+        .collection("messages")
+        .doc(messageId)
+        .delete();
+  }
+  Future deleteMessageForAllFriends(String friendId, String messageId) async {
+    await friendCollection
+        .doc(friendId)
         .collection("messages")
         .doc(messageId)
         .delete();
